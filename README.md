@@ -1,6 +1,17 @@
+```markdown
 # Rebuild VPS tanpa Login ke Panel
 
 Panduan ini memberikan instruksi untuk melakukan rebuild VPS pada berbagai distribusi Linux tanpa perlu login ke panel. Anda dapat mengunduh dan menjalankan skrip yang disediakan untuk memulai proses.
+
+## Distribusi dan Versi yang Didukung
+
+#Rebuild:
+```
+debian      9|10|11|12
+centos      9|10
+ubuntu      16.04|18.04|20.04|22.04|24.04|24.10 [--minimal]
+almalinux   8|9
+```
 
 ## Langkah-langkah
 
@@ -16,7 +27,11 @@ Panduan ini memberikan instruksi untuk melakukan rebuild VPS pada berbagai distr
 
 #### Ubuntu
 
-Instal Ubuntu versi 24.04, 22.04, atau 20.04:
+Instal Ubuntu versi 24.10, 24.04, 22.04, 20.04, 18.04, atau 16.04:
+
+```bash
+bash reinstall.sh ubuntu 24.10
+```
 
 ```bash
 bash reinstall.sh ubuntu 24.04
@@ -30,9 +45,27 @@ bash reinstall.sh ubuntu 22.04
 bash reinstall.sh ubuntu 20.04
 ```
 
+```bash
+bash reinstall.sh ubuntu 18.04
+```
+
+```bash
+bash reinstall.sh ubuntu 16.04
+```
+
+Untuk instalasi minimal Ubuntu:
+
+```bash
+bash reinstall.sh ubuntu 24.10 --minimal
+```
+
 #### Debian
 
-Instal Debian versi 11 (Bullseye), 10 (Buster), atau 9 (Stretch):
+Instal Debian versi 12 (Bookworm), 11 (Bullseye), 10 (Buster), atau 9 (Stretch):
+
+```bash
+bash reinstall.sh debian 12
+```
 
 ```bash
 bash reinstall.sh debian 11
@@ -48,23 +81,24 @@ bash reinstall.sh debian 9
 
 #### CentOS
 
-Instal CentOS versi 8 atau 7:
+Instal CentOS versi 10 atau 9:
 
 ```bash
-bash reinstall.sh centos 8
+bash reinstall.sh centos 10
 ```
 
 ```bash
-bash reinstall.sh centos 7
+bash reinstall.sh centos 9
 ```
 
-### Catatan
+#### AlmaLinux
 
-- Pastikan untuk mengganti versi dengan yang sesuai kebutuhan Anda.
-- Skrip ini akan melakukan instalasi ulang sistem operasi, jadi pastikan untuk membackup data penting sebelum melanjutkan.
-- Gunakan perintah ini dengan kehati-hatian dan pahami risiko yang terkait dengan proses reinstall sistem operasi.
+Instal AlmaLinux versi 9 atau 8:
 
-Panduan ini memungkinkan Anda untuk dengan mudah mengelola dan memperbarui distribusi Linux pada VPS Anda sesuai kebutuhan.
+```bash
+bash reinstall.sh almalinux 9
 ```
 
-Pastikan untuk memeriksa apakah skrip dan sistem telah diuji kompatibel dengan versi terbaru dari sistem operasi yang didukung.
+```bash
+bash reinstall.sh almalinux 8
+```
