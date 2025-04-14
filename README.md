@@ -1,4 +1,3 @@
-```markdown
 # Rebuild VPS tanpa Login ke Panel
 
 Panduan ini memberikan instruksi untuk melakukan rebuild VPS pada berbagai distribusi Linux tanpa perlu login ke panel. Anda dapat mengunduh dan menjalankan skrip yang disediakan untuk memulai proses.
