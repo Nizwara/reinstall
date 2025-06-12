@@ -19,8 +19,17 @@ almalinux   8|9
    ```bash
    curl -O https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh
    ```
-
-2. Jalankan skrip dengan memilih distribusi dan versi sistem operasi yang diinginkan.
+2. OR
+   ```bash
+   bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) debian 10
+   ```
+   ```
+   bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) debian 11
+   ```
+   ```
+   bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) ubuntu 20
+   ```
+3. Jalankan skrip dengan memilih distribusi dan versi sistem operasi yang diinginkan.
 
 ### Contoh Perintah
 
