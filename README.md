@@ -17,7 +17,7 @@ almalinux   8|9
 1. Download skrip `reinstall.sh`.
 
    ```bash
-   curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh
+   curl -O https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh
    ```
 
 2. Jalankan skrip dengan memilih distribusi dan versi sistem operasi yang diinginkan.
