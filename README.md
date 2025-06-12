@@ -27,7 +27,7 @@ almalinux   8|9
    bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) debian 11
    ```
    ```
-   bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) ubuntu 20
+   bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) ubuntu 20.04
    ```
 3. Jalankan skrip dengan memilih distribusi dan versi sistem operasi yang diinginkan.
 
