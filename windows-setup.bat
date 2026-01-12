@@ -167,7 +167,7 @@ move /y %tempFile% %file%
 
 
 rem https://github.com/pbatard/rufus/issues/1990
-for %%a in (RAM TPM SecureBoot) do (
+for %%a in (RAM TPM SecureBoot CPU Storage) do (
     reg add HKLM\SYSTEM\Setup\LabConfig /t REG_DWORD /v Bypass%%aCheck /d 1 /f
 )
 
