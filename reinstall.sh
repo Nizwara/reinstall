@@ -68,13 +68,11 @@ Usage: $reinstall_____ anolis      7|8|23
                        windows     --image-name="windows xxx yyy" --lang=xx-yy
                        windows     --image-name="windows xxx yyy" --iso="http://xxx.com/xxx.iso"
                        netboot.xyz
-                       web         (Start Web UI)
 
        Options:        For Linux/Windows:
                        [--password  PASSWORD]
                        [--ssh-key   KEY]
                        [--ssh-port  PORT]
-                       [--web-port  PORT]
                        [--frpc-toml TOML]
 
                        For Windows Only:
@@ -869,8 +867,8 @@ get_windows_iso_link() {
             '2012 r2' | \
                 2016 | 2019 | 2022 | 2025)
                 case "$edition" in
-                serverstandard | serverstandardcore) echo _ ;;
-                serverdatacenter | serverdatacentercore) echo _ ;;
+                standard | serverstandard | serverstandardcore) echo _ ;;
+                datacenter | serverdatacenter | serverdatacentercore) echo _ ;;
                 esac
                 ;;
             esac
@@ -1547,18 +1545,6 @@ Continue with DD?
         eval "${step}_img_type_warp='$img_type_warp'"
     }
 
-    setos_web() {
-        install_pkg python3
-        if ! [ -f web_ui.py ]; then
-            curl -Lo web_ui.py $confhome/web_ui.py
-        fi
-        if ! [ -f index.html ]; then
-            curl -Lo index.html $confhome/index.html
-        fi
-        python3 web_ui.py
-        exit
-    }
-
     setos_fnos() {
         if [ "$basearch" = aarch64 ]; then
             error_and_exit "FNOS not supports ARM."
@@ -1854,7 +1840,6 @@ verify_os_name() {
         'fnos' \
         'windows' \
         'dd' \
-        'web' \
         'netboot.xyz'; do
         read -r ds vers <<<"$os"
         vers_=${vers//\./\\\.}
