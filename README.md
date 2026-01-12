@@ -10,6 +10,7 @@ debian      9|10|11|12
 centos      9|10
 ubuntu      16.04|18.04|20.04|22.04|24.04|24.10 [--minimal]
 almalinux   8|9
+windows     10|11|server
 ```
 
 ## Langkah-langkah
@@ -109,4 +110,35 @@ bash reinstall.sh almalinux 9
 
 ```bash
 bash reinstall.sh almalinux 8
+```
+
+#### Windows
+
+Instal Windows (akan mencari ISO otomatis dari massgrave.dev):
+
+**Format:**
+```bash
+bash reinstall.sh windows --image-name="windows [version] [edition]" --lang=[language]
+```
+
+**Contoh:**
+
+Instal Windows 10 Pro:
+```bash
+bash reinstall.sh windows --image-name="windows 10 pro" --lang=en-us
+```
+
+Instal Windows 11 Pro:
+```bash
+bash reinstall.sh windows --image-name="windows 11 pro" --lang=en-us
+```
+
+Instal Windows Server 2022 Datacenter:
+```bash
+bash reinstall.sh windows --image-name="windows server 2022 datacenter" --lang=en-us
+```
+
+Jika Anda menjalankan dari Windows, gunakan `reinstall.bat` (Run as Administrator):
+```cmd
+reinstall.bat windows --image-name="windows 11 pro"
 ```
