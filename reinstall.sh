@@ -1010,9 +1010,7 @@ get_windows_iso_link() {
     if [ -n "$label_msdl" ]; then
         iso=$(curl -L "$page_url" | grep -ioP 'https://.*?#[0-9]+' | head -1 | grep .)
     else
-        # 兼容 massgrave.dev 使用 buzzheavier.com 的情况
-        # 匹配 href="http..." 或 href=http...
-        curl -L "$page_url" | grep -ioP "href=['\"]?http.*?.(iso|img)" >$tmp/win.list
+        curl -L "$page_url" | grep -ioP 'https://.*?.(iso|img)' >$tmp/win.list
 
         # 如果不是 ltsc ，应该先去除 ltsc 链接，否则最终链接有 ltsc 的
         # 例如查找 windows 10 iot enterprise，会得到
@@ -1065,17 +1063,7 @@ get_windows_iso_link_inner() {
         regex=${regex// /_}
 
         echo "looking for: $regex" >&2
-        if iso=$(grep -Ei "$regex" "$tmp/win.list" | get_shortest_line | grep .); then
-            # 提取 URL
-            iso=$(echo "$iso" | sed -E "s/^href=['\"]?(https?:\/\/[^ \"'>]+).*/\1/")
-
-            # 解析 buzzheavier
-            if [[ "$iso" == *"buzzheavier.com"* ]]; then
-                redirect_url=$(curl -s -D - "$iso/download" -H "Referer: $iso" -o /dev/null | grep -i '^hx-redirect:' | cut -d: -f2- | tr -d '[:space:]')
-                if [ -n "$redirect_url" ]; then
-                    iso=$redirect_url
-                fi
-            fi
+        if iso=$(grep -Ei "/$regex" "$tmp/win.list" | get_shortest_line | grep .); then
             return
         fi
     done
