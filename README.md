@@ -142,3 +142,13 @@ Jika Anda menjalankan dari Windows, gunakan `reinstall.bat` (Run as Administrato
 ```cmd
 reinstall.bat windows --image-name="windows 11 pro"
 ```
+
+#### Web Interface
+
+Jika Anda lebih suka menggunakan antarmuka web untuk memilih sistem operasi:
+
+```bash
+bash reinstall.sh web
+```
+
+Perintah ini akan memulai server web lokal pada port 8000. Buka browser Anda dan akses `http://IP_ADDRESS:8000` untuk menggunakan antarmuka grafis.

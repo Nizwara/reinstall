@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reinstall OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen py-10 px-4">
+    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-blue-600 px-6 py-4">
+            <h1 class="text-white text-xl font-bold">System Reinstallation</h1>
+            <p class="text-blue-100 text-sm">Select an operating system to install.</p>
+        </div>
+
+        <form id="installForm" class="p-6 space-y-4">
+            <!-- OS Selection -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="distro">Operating System</label>
+                <select id="distro" name="distro" class="block w-full bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="" disabled selected>Select OS...</option>
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <!-- Version Selection -->
+            <div id="version-group" class="hidden">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="version">Version</label>
+                <select id="version" name="version" class="block w-full bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <!-- Common Options -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Leave empty for default" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="port">SSH Port</label>
+                    <input type="number" id="port" name="port" placeholder="22" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+
+            <!-- Windows Specific -->
+            <div id="windows-options" class="hidden space-y-4 border-t pt-4 mt-4">
+                <h3 class="font-semibold text-gray-600">Windows Options</h3>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="image_name">Image Name (Required)</label>
+                    <input type="text" id="image_name" name="image_name" placeholder="e.g., windows 10 pro" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="iso">ISO URL (Optional)</label>
+                    <input type="url" id="iso" name="iso" placeholder="http://..." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="rdp_port">RDP Port</label>
+                    <input type="number" id="rdp_port" name="rdp_port" placeholder="3389" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+
+            <!-- DD Specific -->
+            <div id="dd-options" class="hidden space-y-4 border-t pt-4 mt-4">
+                <h3 class="font-semibold text-gray-600">DD Options</h3>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="img">Image URL (Required)</label>
+                    <input type="url" id="img" name="img" placeholder="http://..." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150">
+                    Start Installation
+                </button>
+            </div>
+        </form>
+
+        <!-- Log Output -->
+        <div id="log-area" class="hidden bg-gray-900 text-green-400 p-4 font-mono text-sm overflow-x-auto whitespace-pre-wrap"></div>
+    </div>
+
+    <script>
+        const osData = {
+            'alpine': ['3.23', '3.22', '3.21', '3.20', '3.19'],
+            'ubuntu': ['25.04', '24.04', '22.04', '20.04', '18.04', '16.04'],
+            'debian': ['12', '11', '10', '9'],
+            'centos': ['10', '9', '7'],
+            'almalinux': ['10', '9', '8'],
+            'rocky': ['9', '8'],
+            'fedora': ['42', '41'],
+            'opensuse': ['tumbleweed', '16.0', '15.6'],
+            'openeuler': ['25.03', '24.03', '22.03', '20.03'],
+            'anolis': ['23', '8', '7'],
+            'opencloudos': ['23', '9', '8'],
+            'oracle': ['9', '8'],
+            'nixos': ['25.05'],
+            'kali': [],
+            'arch': [],
+            'gentoo': [],
+            'aosc': [],
+            'fnos': [],
+            'windows': [],
+            'dd': [],
+            'netboot.xyz': []
+        };
+
+        const distroSelect = document.getElementById('distro');
+        const versionSelect = document.getElementById('version');
+        const versionGroup = document.getElementById('version-group');
+        const windowsOptions = document.getElementById('windows-options');
+        const ddOptions = document.getElementById('dd-options');
+        const form = document.getElementById('installForm');
+        const logArea = document.getElementById('log-area');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Populate Distro Select
+        for (const distro in osData) {
+            const option = document.createElement('option');
+            option.value = distro;
+            option.textContent = distro.charAt(0).toUpperCase() + distro.slice(1);
+            distroSelect.appendChild(option);
+        }
+
+        distroSelect.addEventListener('change', (e) => {
+            const distro = e.target.value;
+            const versions = osData[distro];
+
+            // Reset UI
+            versionSelect.innerHTML = '';
+            windowsOptions.classList.add('hidden');
+            ddOptions.classList.add('hidden');
+            versionGroup.classList.add('hidden');
+
+            if (distro === 'windows') {
+                windowsOptions.classList.remove('hidden');
+            } else if (distro === 'dd') {
+                ddOptions.classList.remove('hidden');
+            } else if (versions && versions.length > 0) {
+                versionGroup.classList.remove('hidden');
+                versions.forEach(ver => {
+                    const option = document.createElement('option');
+                    option.value = ver;
+                    option.textContent = ver;
+                    versionSelect.appendChild(option);
+                });
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Running...';
+            logArea.classList.remove('hidden');
+            logArea.textContent = 'Starting...\n';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const text = decoder.decode(value);
+                    logArea.textContent += text;
+                    // Auto scroll
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+
+                logArea.textContent += '\n\nProcess finished.';
+                submitBtn.textContent = 'Finished';
+
+            } catch (error) {
+                logArea.textContent += '\nError: ' + error.message;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Retry';
+            }
+        });
+    </script>
+</body>
+</html>
