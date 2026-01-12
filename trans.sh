@@ -10,7 +10,7 @@ set -eE
 
 # 用于判断 reinstall.sh 和 trans.sh 是否兼容
 # shellcheck disable=SC2034
-SCRIPT_VERSION=1B65A6BD-0672-4DCE-AD54-430BEBFD42E7
+SCRIPT_VERSION=48a69ce1-7e41-4fcd-a401-7533879b6a02
 
 TRUE=0
 FALSE=1
@@ -5728,6 +5728,23 @@ install_windows() {
                 image_name=$matched_image_name
                 image_index=$(wiminfo "$iso_install_wim" "$image_name" | grep 'Index:' | awk '{print $NF}')
                 break
+            fi
+
+            # Windows Server 2025
+            # Standard -> SERVERSTANDARD
+            # Datacenter -> SERVERDATACENTER
+            if echo "$image_name" | grep -iq "server 2025"; then
+                fixed_name=$(echo "$image_name" | sed -E \
+                    -e 's/ [Ss][Tt][Aa][Nn][Dd][Aa][Rr][Dd] [Cc][Oo][Rr][Ee]/ SERVERSTANDARDCORE/g' \
+                    -e 's/ [Ss][Tt][Aa][Nn][Dd][Aa][Rr][Dd]/ SERVERSTANDARD/g' \
+                    -e 's/ [Dd][Aa][Tt][Aa][Cc][Ee][Nn][Tt][Ee][Rr] [Cc][Oo][Rr][Ee]/ SERVERDATACENTERCORE/g' \
+                    -e 's/ [Dd][Aa][Tt][Aa][Cc][Ee][Nn][Tt][Ee][Rr]/ SERVERDATACENTER/g')
+
+                if matched_image_name=$(echo "$all_image_names" | grep -ix "$fixed_name"); then
+                    image_name=$matched_image_name
+                    image_index=$(wiminfo "$iso_install_wim" "$image_name" | grep 'Index:' | awk '{print $NF}')
+                    break
+                fi
             fi
 
             # 匹配失败
