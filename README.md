@@ -116,31 +116,53 @@ bash reinstall.sh almalinux 8
 
 Instal Windows (akan mencari ISO otomatis dari massgrave.dev):
 
+**Supported Versions:**
+- **Windows 10:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2015, 2016, 2019, 2021)
+- **Windows 11:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2024)
+- **Windows Server:**
+  - 2025 (Standard, Datacenter)
+  - 2022 (Standard, Datacenter)
+  - 2019 (Standard, Datacenter)
+  - 2016 (Standard, Datacenter)
+  - 2012 R2 (Standard, Datacenter)
+  - 2008 R2 (Standard, Datacenter, Enterprise, Web)
+  - 2008 (Standard, Datacenter, Enterprise, Web)
+
 **Format:**
 ```bash
 bash reinstall.sh windows --image-name="windows [version] [edition]" --lang=[language]
 ```
 
-**Contoh:**
+**Contoh (Examples):**
 
-Instal Windows 10 Pro:
+Windows 10 Pro:
 ```bash
 bash reinstall.sh windows --image-name="windows 10 pro" --lang=en-us
 ```
 
-Instal Windows 11 Pro:
+Windows 11 Pro:
 ```bash
 bash reinstall.sh windows --image-name="windows 11 pro" --lang=en-us
 ```
 
-Instal Windows Server 2022 Datacenter:
+Windows 10 LTSC 2021:
+```bash
+bash reinstall.sh windows --image-name="windows 10 enterprise ltsc 2021" --lang=en-us
+```
+
+Windows Server 2025 Standard:
+```bash
+bash reinstall.sh windows --image-name="windows server 2025 standard" --lang=en-us
+```
+
+Windows Server 2022 Datacenter:
 ```bash
 bash reinstall.sh windows --image-name="windows server 2022 datacenter" --lang=en-us
 ```
 
-Instal Windows Server 2025 Standard:
+Windows Server 2012 R2 Datacenter:
 ```bash
-bash reinstall.sh windows --image-name="windows server 2025 standard" --lang=en-us
+bash reinstall.sh windows --image-name="windows server 2012 r2 datacenter" --lang=en-us
 ```
 
 Jika Anda menjalankan dari Windows, gunakan `reinstall.bat` (Run as Administrator):
