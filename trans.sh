@@ -10,7 +10,7 @@ set -eE
 
 # 用于判断 reinstall.sh 和 trans.sh 是否兼容
 # shellcheck disable=SC2034
-SCRIPT_VERSION=48a69ce1-7e41-4fcd-a401-7533879b6a02
+SCRIPT_VERSION=0fb1c394-694c-42f8-8e82-a9eedf0c78cd
 
 TRUE=0
 FALSE=1
@@ -6365,7 +6365,14 @@ EOF
             *)
                 case "$windows_type" in
                 client) echo "w$product_ver" ;;
-                server) echo "$product_ver" | sed -E -e 's/ //' -e 's/^200?/2k/' -e 's/r2/R2/' ;;
+                server)
+                    # Virtio ISO typically doesn't have 2k25 folder yet, fallback to 2k22
+                    if [ "$product_ver" = "2025" ]; then
+                        echo "2k22"
+                    else
+                        echo "$product_ver" | sed -E -e 's/ //' -e 's/^200?/2k/' -e 's/r2/R2/'
+                    fi
+                    ;;
                 esac
                 ;;
             esac
