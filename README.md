@@ -138,6 +138,11 @@ Instal Windows Server 2022 Datacenter:
 bash reinstall.sh windows --image-name="windows server 2022 datacenter" --lang=en-us
 ```
 
+Instal Windows Server 2025 Standard:
+```bash
+bash reinstall.sh windows --image-name="windows server 2025 standard" --lang=en-us
+```
+
 Jika Anda menjalankan dari Windows, gunakan `reinstall.bat` (Run as Administrator):
 ```cmd
 reinstall.bat windows --image-name="windows 11 pro"
