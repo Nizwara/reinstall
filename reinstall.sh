@@ -11,7 +11,7 @@ confhome_cn=https://cnb.cool/Nizwara/reinstall/-/git/raw/main
 DEFAULT_PASSWORD=123@@@
 
 # 用于判断 reinstall.sh 和 trans.sh 是否兼容
-SCRIPT_VERSION=0fb1c394-694c-42f8-8e82-a9eedf0c78cd
+SCRIPT_VERSION=ba1e64f3-d50f-46a3-91bc-0f29780b3c80
 
 # 记录要用到的 windows 程序，运行时输出删除 \r
 WINDOWS_EXES='cmd powershell wmic reg diskpart netsh bcdedit mountvol'

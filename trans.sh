@@ -10,7 +10,7 @@ set -eE
 
 # 用于判断 reinstall.sh 和 trans.sh 是否兼容
 # shellcheck disable=SC2034
-SCRIPT_VERSION=0fb1c394-694c-42f8-8e82-a9eedf0c78cd
+SCRIPT_VERSION=ba1e64f3-d50f-46a3-91bc-0f29780b3c80
 
 TRUE=0
 FALSE=1
