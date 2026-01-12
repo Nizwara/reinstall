@@ -51,7 +51,17 @@
                 <h3 class="font-semibold text-gray-600">Windows Options</h3>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="image_name">Image Name (Required)</label>
-                    <input type="text" id="image_name" name="image_name" placeholder="e.g., windows 10 pro" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <input type="text" id="image_name" name="image_name" list="windows-images" placeholder="e.g., windows 10 pro" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <datalist id="windows-images">
+                        <option value="windows 10 pro">
+                        <option value="windows 11 pro">
+                        <option value="windows server 2025 datacenter">
+                        <option value="windows server 2022 datacenter">
+                        <option value="windows server 2019 datacenter">
+                        <option value="windows server 2016 datacenter">
+                        <option value="windows server 2012 r2 datacenter">
+                        <option value="windows server 2008 r2 datacenter">
+                    </datalist>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="iso">ISO URL (Optional)</label>
