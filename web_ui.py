@@ -8,6 +8,8 @@ import os
 PORT = 8000
 
 class ReinstallHandler(http.server.SimpleHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
+
     def do_GET(self):
         if self.path == '/':
             self.path = 'index.html'

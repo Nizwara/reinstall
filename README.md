@@ -145,10 +145,15 @@ reinstall.bat windows --image-name="windows 11 pro"
 
 #### Web Interface
 
-Jika Anda lebih suka menggunakan antarmuka web untuk memilih sistem operasi:
+Jika Anda lebih suka menggunakan antarmuka web untuk memilih sistem operasi, Anda dapat mengunduh dan menjalankan skripnya langsung:
 
 ```bash
-bash reinstall.sh web
+curl -O https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh && bash reinstall.sh web
 ```
 
-Perintah ini akan memulai server web lokal pada port 8000. Buka browser Anda dan akses `http://IP_ADDRESS:8000` untuk menggunakan antarmuka grafis.
+Perintah ini akan:
+1. Mengunduh script `reinstall.sh`
+2. Menginstall dependensi yang diperlukan (seperti python3)
+3. Memulai server web lokal pada port 8000
+
+Setelah perintah dijalankan, buka browser Anda dan akses `http://IP_ADDRESS:8000` untuk menggunakan antarmuka grafis.
