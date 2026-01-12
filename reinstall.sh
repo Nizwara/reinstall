@@ -11,7 +11,7 @@ confhome_cn=https://cnb.cool/Nizwara/reinstall/-/git/raw/main
 DEFAULT_PASSWORD=123@@@
 
 # 用于判断 reinstall.sh 和 trans.sh 是否兼容
-SCRIPT_VERSION=4BACD833-A585-23BA-6CBB-9AA4E08E0003
+SCRIPT_VERSION=1B65A6BD-0672-4DCE-AD54-430BEBFD42E7
 
 # 记录要用到的 windows 程序，运行时输出删除 \r
 WINDOWS_EXES='cmd powershell wmic reg diskpart netsh bcdedit mountvol'
@@ -55,7 +55,7 @@ Usage: $reinstall_____ anolis      7|8|23
                        nixos       25.05
                        debian      9|10|11|12
                        opensuse    15.6|tumbleweed
-                       alpine      3.19|3.20|3.21|3.22
+                       alpine      3.19|3.20|3.21|3.22|3.23
                        openeuler   20.03|22.03|24.03|25.03
                        ubuntu      16.04|18.04|20.04|22.04|24.04|25.04 [--minimal]
                        kali
@@ -1842,7 +1842,7 @@ verify_os_name() {
         'nixos       25.05' \
         'debian      9|10|11|12' \
         'opensuse    15.6|16.0|tumbleweed' \
-        'alpine      3.19|3.20|3.21|3.22' \
+        'alpine      3.19|3.20|3.21|3.22|3.23' \
         'openeuler   20.03|22.03|24.03|25.03' \
         'ubuntu      16.04|18.04|20.04|22.04|24.04|25.04' \
         'redhat' \
