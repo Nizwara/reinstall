@@ -1015,7 +1015,8 @@ get_windows_iso_link() {
     else
         # 兼容 massgrave.dev 使用 buzzheavier.com 的情况
         # 匹配 href="http..." 或 href=http...
-        curl -L "$page_url" | grep -ioP "href=['\"]?http.*?.(iso|img)" >$tmp/win.list
+        # 还要匹配文件名
+        curl -L "$page_url" >$tmp/win.html
 
         # 如果不是 ltsc ，应该先去除 ltsc 链接，否则最终链接有 ltsc 的
         # 例如查找 windows 10 iot enterprise，会得到
@@ -1023,9 +1024,9 @@ get_windows_iso_link() {
         # en-us_windows_10_iot_enterprise_version_22h2_arm64_dvd_39566b6b.iso
         # sed -Ei 和 sed -iE 是不同的
         if is_ltsc; then
-            sed -Ei '/ltsc|ltsb/!d' $tmp/win.list
+            sed -Ei '/ltsc|ltsb/!d' $tmp/win.html
         else
-            sed -Ei '/ltsc|ltsb/d' $tmp/win.list
+            sed -Ei '/ltsc|ltsb/d' $tmp/win.html
         fi
 
         get_windows_iso_link_inner
@@ -1068,18 +1069,23 @@ get_windows_iso_link_inner() {
         regex=${regex// /_}
 
         echo "looking for: $regex" >&2
-        if iso=$(grep -Ei "$regex" "$tmp/win.list" | get_shortest_line | grep .); then
+        # 在 html 中查找包含文件名的行，然后提取 href
+        if lines=$(grep -Ei "$regex" "$tmp/win.html"); then
             # 提取 URL
-            iso=$(echo "$iso" | sed -E "s/^href=['\"]?(https?:\/\/[^ \"'>]+).*/\1/")
+            # 可能有多个匹配，取最短的行（可能是最匹配的）
+            # buzzheavier 链接没有 .iso 后缀，所以不能只匹配 .iso
+            iso=$(echo "$lines" | grep -ioP "href=['\"]?\Khttp[^'\" >]+" | get_shortest_line | grep .)
 
-            # 解析 buzzheavier
-            if [[ "$iso" == *"buzzheavier.com"* ]]; then
-                redirect_url=$(curl -s -D - "$iso/download" -H "Referer: $iso" -o /dev/null | grep -i '^hx-redirect:' | cut -d: -f2- | tr -d '[:space:]')
-                if [ -n "$redirect_url" ]; then
-                    iso=$redirect_url
+            if [ -n "$iso" ]; then
+                # 解析 buzzheavier
+                if [[ "$iso" == *"buzzheavier.com"* ]]; then
+                    redirect_url=$(curl -s -D - "$iso/download" -H "Referer: $iso" -o /dev/null | grep -i '^hx-redirect:' | cut -d: -f2- | tr -d '[:space:]')
+                    if [ -n "$redirect_url" ]; then
+                        iso=$redirect_url
+                    fi
                 fi
+                return
             fi
-            return
         fi
     done
 
