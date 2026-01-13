@@ -1,8 +1,8 @@
-# Rebuild VPS tanpa Login ke Panel
+# Rebuild VPS without Panel Login
 
-Panduan ini memberikan instruksi untuk melakukan rebuild VPS pada berbagai distribusi Linux tanpa perlu login ke panel. Anda dapat mengunduh dan menjalankan skrip yang disediakan untuk memulai proses.
+This guide provides instructions for rebuilding a VPS with various Linux distributions without needing to log in to a control panel. You can download and run the provided script to start the process.
 
-## Distribusi dan Versi yang Didukung
+## Supported Distributions and Versions
 
 #Rebuild:
 ```
@@ -13,9 +13,9 @@ almalinux   8|9
 windows     10|11|server
 ```
 
-## Langkah-langkah
+## Steps
 
-1. Download skrip `reinstall.sh`.
+1. Download the `reinstall.sh` script.
 
    ```bash
    curl -O https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh
@@ -30,13 +30,13 @@ windows     10|11|server
    ```
    bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) ubuntu 20.04
    ```
-3. Jalankan skrip dengan memilih distribusi dan versi sistem operasi yang diinginkan.
+3. Run the script by selecting the desired operating system distribution and version.
 
-### Contoh Perintah
+### Command Examples
 
 #### Ubuntu
 
-Instal Ubuntu versi 24.10, 24.04, 22.04, 20.04, 18.04, atau 16.04:
+Install Ubuntu version 24.10, 24.04, 22.04, 20.04, 18.04, or 16.04:
 
 ```bash
 bash reinstall.sh ubuntu 24.10
@@ -62,7 +62,7 @@ bash reinstall.sh ubuntu 18.04
 bash reinstall.sh ubuntu 16.04
 ```
 
-Untuk instalasi minimal Ubuntu:
+For Ubuntu minimal installation:
 
 ```bash
 bash reinstall.sh ubuntu 24.10 --minimal
@@ -70,7 +70,7 @@ bash reinstall.sh ubuntu 24.10 --minimal
 
 #### Debian
 
-Instal Debian versi 12 (Bookworm), 11 (Bullseye), 10 (Buster), atau 9 (Stretch):
+Install Debian version 12 (Bookworm), 11 (Bullseye), 10 (Buster), or 9 (Stretch):
 
 ```bash
 bash reinstall.sh debian 12
@@ -90,7 +90,7 @@ bash reinstall.sh debian 9
 
 #### CentOS
 
-Instal CentOS versi 10 atau 9:
+Install CentOS version 10 or 9:
 
 ```bash
 bash reinstall.sh centos 10
@@ -102,7 +102,7 @@ bash reinstall.sh centos 9
 
 #### AlmaLinux
 
-Instal AlmaLinux versi 9 atau 8:
+Install AlmaLinux version 9 or 8:
 
 ```bash
 bash reinstall.sh almalinux 9
@@ -114,7 +114,7 @@ bash reinstall.sh almalinux 8
 
 #### Windows
 
-Instal Windows (akan mencari ISO otomatis dari massgrave.dev):
+Install Windows (will automatically search for ISO from massgrave.dev):
 
 **Supported Versions:**
 - **Windows 10:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2015, 2016, 2019, 2021)
@@ -132,7 +132,7 @@ Instal Windows (akan mencari ISO otomatis dari massgrave.dev):
 bash reinstall.sh windows --image-name="windows [version] [edition]" --lang=[language]
 ```
 
-**Contoh (Examples):**
+**Examples:**
 
 Windows 10 Pro:
 ```bash
@@ -159,7 +159,7 @@ Windows Server 2012 R2 Datacenter:
 bash reinstall.sh windows --image-name="windows server 2012 r2 datacenter" --lang=en-us
 ```
 
-Jika Anda menjalankan dari Windows, gunakan `reinstall.bat` (Run as Administrator):
+If you are running from Windows, use `reinstall.bat` (Run as Administrator):
 ```cmd
 reinstall.bat windows --image-name="windows 11 pro"
 ```
