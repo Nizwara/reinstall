@@ -70,8 +70,15 @@ for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Current
 )
 
 rem 获取 installer 卷 id
-for /f "tokens=2" %%a in ('echo list vol ^| diskpart ^| find "installer"') do (
+echo list vol | diskpart
+for /f "tokens=2" %%a in ('echo list vol ^| diskpart ^| find /i "installer"') do (
     set "VolIndex=%%a"
+)
+
+if "%VolIndex%"=="" (
+    echo Error: Installer volume not found!
+    echo list vol | diskpart
+    exit /b 1
 )
 
 rem 将 installer 分区设为 Y 盘
@@ -194,6 +201,10 @@ if "%UseDismInstall%"=="1" (
 
     if "%InstallWim%"=="" (
         echo Error: install.wim not found!
+        echo Listing Y:
+        dir Y:\
+        echo Listing Y:\sources
+        dir Y:\sources
         exit /b 1
     )
 
