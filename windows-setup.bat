@@ -229,6 +229,10 @@ if "%UseDismInstall%"=="1" (
     )
     reg unload HKLM\OFFLINE
 
+    rem Inject drivers (especially VirtIO storage)
+    dism /Image:C:\ /Add-Driver /Driver:X:\drivers /Recurse
+    if exist X:\custom_drivers\ dism /Image:C:\ /Add-Driver /Driver:X:\custom_drivers /Recurse
+
     echo DISM installation complete. Rebooting...
     wpeutil reboot
     exit /b

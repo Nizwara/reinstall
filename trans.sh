@@ -6746,7 +6746,11 @@ EOF
 
     # 修改应答文件
     download $confhome/windows.xml /tmp/autounattend.xml
-    locale=$(get_selected_image_prop 'Default Language')
+    if [ -n "$lang" ]; then
+        locale=$lang
+    else
+        locale=$(get_selected_image_prop 'Default Language')
+    fi
     use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
     password_base64=$(get_password_windows_administrator_base64)
     # 7601.24214.180801-1700.win7sp1_ldr_escrow_CLIENT_ULTIMATE_x64FRE_en-us.iso Image Name 为空

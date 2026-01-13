@@ -1011,7 +1011,7 @@ get_windows_iso_link() {
     fi
 
     if [ -n "$label_msdl" ]; then
-        iso=$(curl -L "$page_url" | grep -ioP 'https://.*?#[0-9]+' | head -1 | grep .)
+        iso=$(curl -L "$page_url" | grep -o 'https://[^"]*#[0-9]\+' | head -1 | grep .)
     else
         # 兼容 massgrave.dev 使用 buzzheavier.com 的情况
         # 匹配 href="http..." 或 href=http...
@@ -1075,7 +1075,7 @@ get_windows_iso_link_inner() {
             # 提取 URL
             # 可能有多个匹配，取最短的行（可能是最匹配的）
             # buzzheavier 链接没有 .iso 后缀，所以不能只匹配 .iso
-            iso=$(echo "$lines" | grep -ioP "href=['\"]?\Khttp[^'\" >]+" | get_shortest_line | grep .)
+            iso=$(echo "$lines" | grep -o 'http[^"'\'' >]\+' | get_shortest_line | grep .)
 
             if [ -n "$iso" ]; then
                 # 解析 buzzheavier
@@ -1318,7 +1318,7 @@ Continue?
             fi
 
             # iso
-            filename=$(curl -L $mirror/ | grep -oP "ubuntu-$releasever.*?-live-server-$basearch_alt.iso" |
+            filename=$(curl -L $mirror/ | grep -o "ubuntu-$releasever.*-live-server-$basearch_alt.iso" |
                 sort -uV | tail -1 | grep .)
             iso=$mirror/$filename
             # 在 ubuntu 20.04 上，file 命令检测 ubuntu 22.04 iso 结果是 DOS/MBR boot sector
@@ -1524,6 +1524,7 @@ The current machine is $basearch, but it seems the ISO is for $iso_arch. Continu
         eval "${step}_iso='$iso'"
         eval "${step}_boot_wim='$boot_wim'"
         eval "${step}_image_name='$image_name'"
+    eval "${step}_lang='$lang'"
     }
 
     # shellcheck disable=SC2154
@@ -1601,7 +1602,7 @@ Continue with DD?
         fi
 
         dir=os-$basearch_alt/base
-        file=$(curl -L $mirror/$dir/ | grep -oP 'aosc-os_base_.*?\.tar.xz' |
+        file=$(curl -L $mirror/$dir/ | grep -o 'aosc-os_base_.*\.tar.xz' |
             sort -uV | tail -1 | grep .)
         img=$mirror/$dir/$file
         test_url $img 'tar.xz'
@@ -1662,7 +1663,7 @@ Continue with DD?
                 # 不加 / 会跳转到 https://dl.fedoraproject.org，纯 ipv6 无法访问
                 # curl -L -6 https://d2lzkl7pfhq30w.cloudfront.net/pub/fedora/linux/releases/42/Cloud/x86_64/images
                 # curl -L -6 https://d2lzkl7pfhq30w.cloudfront.net/pub/fedora/linux/releases/42/Cloud/x86_64/images/
-                filename=$(curl -L $ci_mirror/ | grep -oP "Fedora-Cloud-Base-Generic.*?.qcow2" |
+                filename=$(curl -L $ci_mirror/ | grep -o "Fedora-Cloud-Base-Generic.*\.qcow2" |
                     sort -uV | tail -1 | grep .)
                 ci_image=$ci_mirror/$filename
                 ;;
@@ -1751,7 +1752,7 @@ Continue with DD?
         if is_use_cloud_image; then
             # ci
             dir=$releasever/images/$basearch
-            file=$(curl -L $mirror/$dir/ | grep -oP 'OpenCloudOS.*?\.qcow2' |
+            file=$(curl -L $mirror/$dir/ | grep -o 'OpenCloudOS.*\.qcow2' |
                 sort -uV | tail -1 | grep .)
             eval ${step}_img=$mirror/$dir/$file
         else
@@ -1765,9 +1766,9 @@ Continue with DD?
             # ci
             dir=$releasever/isos/GA/$basearch
             [ "$releasever" -ge 23 ] &&
-                filename='AnolisOS.*?\.qcow2' ||
-                filename='AnolisOS.*?-ANCK\.qcow2'
-            file=$(curl -L $mirror/$dir/ | grep -oP "$filename" |
+                filename='AnolisOS.*\.qcow2' ||
+                filename='AnolisOS.*-ANCK\.qcow2'
+            file=$(curl -L $mirror/$dir/ | grep -o "$filename" |
                 sort -uV | tail -1 | grep .)
             eval ${step}_img=$mirror/$dir/$file
         else
@@ -2788,7 +2789,7 @@ download_and_extract_apk() {
 
     install_pkg tar xz
     is_in_china && mirror=http://mirror.nju.edu.cn/alpine || mirror=https://dl-cdn.alpinelinux.org/alpine
-    package_apk=$(curl -L $mirror/v$alpine_ver/main/$basearch/ | grep -oP "$package-[^-]*-[^-]*\.apk" | sort -u)
+    package_apk=$(curl -L $mirror/v$alpine_ver/main/$basearch/ | grep -o "$package-[^-]*-[^-]*\.apk" | sort -u)
     if ! [ "$(wc -l <<<"$package_apk")" -eq 1 ]; then
         error_and_exit "find no/multi apks."
     fi
