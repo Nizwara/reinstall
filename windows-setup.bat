@@ -197,8 +197,11 @@ rem 因此要回退到旧版，或者手动修复 MBR
 rem server 2025 + bios 也是
 rem 但是 server 2025 官网写支持 bios
 rem TODO: 使用 ms-sys 可以不修复？
+if %BuildNumber% GEQ 26040 (
+    set ForceOldSetup=1
+)
+
 if %BuildNumber% GEQ 26040 if "%BootType%"=="bios" (
-    rem set ForceOldSetup=1
     bootrec /fixmbr
 )
 
