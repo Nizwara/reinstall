@@ -5730,10 +5730,10 @@ install_windows() {
                 break
             fi
 
-            # Windows Server 2025
+            # Windows Server 2025 / 2022 (some ISOs)
             # Standard -> SERVERSTANDARD
             # Datacenter -> SERVERDATACENTER
-            if echo "$image_name" | grep -iq "server 2025"; then
+            if echo "$image_name" | grep -iq "server"; then
                 fixed_name=$(echo "$image_name" | sed -E \
                     -e 's/ [Ss][Tt][Aa][Nn][Dd][Aa][Rr][Dd] [Cc][Oo][Rr][Ee]/ SERVERSTANDARDCORE/g' \
                     -e 's/ [Ss][Tt][Aa][Nn][Dd][Aa][Rr][Dd]/ SERVERSTANDARD/g' \
@@ -6786,27 +6786,11 @@ EOF
         sed -i "s/%key%/$key/" /tmp/autounattend.xml
     elif [ -f "$(get_path_in_correct_case /os/installer/sources/ei.cfg)" ]; then
         # 镜像有 ei.cfg (Usually Evaluation or Retail with ei.cfg)
-        # Server 2025 Eval has ei.cfg, should NOT inject KMS key.
         # 删除 key 字段
         sed -i "/%key%/d" /tmp/autounattend.xml
     else
         # 镜像无 ei.cfg (Volume/Retail needing key)
-        # Server 2025 requires a key for unattended setup if no ei.cfg present (or if it's not Eval)
-        key_injected=false
-        if [ "$product_ver" = "2025" ]; then
-            if echo "$image_name" | grep -iq "STANDARD"; then
-                sed -i "s/%key%/TVRH6-WHNXV-R9WG3-9XRFY-MY832/" /tmp/autounattend.xml
-                key_injected=true
-            elif echo "$image_name" | grep -iq "DATACENTER"; then
-                sed -i "s/%key%/D764K-2NDRG-47T6Q-P8T8W-YP6DF/" /tmp/autounattend.xml
-                key_injected=true
-            fi
-        fi
-
-        if [ "$key_injected" = false ]; then
-            # Fallback to empty key for other versions
-            sed -i "s/%key%//" /tmp/autounattend.xml
-        fi
+        sed -i "s/%key%//" /tmp/autounattend.xml
     fi
 
     # 挂载 boot.wim

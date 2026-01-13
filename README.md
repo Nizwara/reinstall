@@ -120,7 +120,6 @@ Instal Windows (akan mencari ISO otomatis dari massgrave.dev):
 - **Windows 10:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2015, 2016, 2019, 2021)
 - **Windows 11:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2024)
 - **Windows Server:**
-  - 2025 (Standard, Datacenter)
   - 2022 (Standard, Datacenter)
   - 2019 (Standard, Datacenter)
   - 2016 (Standard, Datacenter)
@@ -148,11 +147,6 @@ bash reinstall.sh windows --image-name="windows 11 pro" --lang=en-us
 Windows 10 LTSC 2021:
 ```bash
 bash reinstall.sh windows --image-name="windows 10 enterprise ltsc 2021" --lang=en-us
-```
-
-Windows Server 2025 Standard:
-```bash
-bash reinstall.sh windows --image-name="windows server 2025 standard" --lang=en-us
 ```
 
 Windows Server 2022 Datacenter:
