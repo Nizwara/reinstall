@@ -859,17 +859,17 @@ get_windows_iso_link() {
             case "$version" in
             2008 | '2008 r2')
                 case "$edition" in
-                serverweb | serverwebcore) echo _ ;;
-                serverstandard | serverstandardcore) echo _ ;;
-                serverenterprise | serverenterprisecore) echo _ ;;
-                serverdatacenter | serverdatacentercore) echo _ ;;
+                serverweb | serverwebcore | web) echo _ ;;
+                serverstandard | serverstandardcore | standard) echo _ ;;
+                serverenterprise | serverenterprisecore | enterprise) echo _ ;;
+                serverdatacenter | serverdatacentercore | datacenter) echo _ ;;
                 esac
                 ;;
             '2012 r2' | \
                 2016 | 2019 | 2022 | 2025)
                 case "$edition" in
-                serverstandard | serverstandardcore) echo _ ;;
-                serverdatacenter | serverdatacentercore) echo _ ;;
+                serverstandard | serverstandardcore | standard) echo _ ;;
+                serverdatacenter | serverdatacentercore | datacenter) echo _ ;;
                 esac
                 ;;
             esac
