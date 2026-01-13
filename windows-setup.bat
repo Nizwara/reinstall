@@ -101,6 +101,14 @@ if "%is4kn%"=="1" (
     set EFISize=100
 )
 
+rem Server 2025 (Build 26040+) or Win11 24H2 requires large disk space (~16GB)
+rem Many VPS have small disks (10-20GB), causing setup.exe to fail with "0x80070070" or "Installation requires at least ..."
+rem We use DISM to apply image directly to bypass this check.
+set UseDismInstall=0
+if %BuildNumber% GEQ 26040 (
+    set UseDismInstall=1
+)
+
 rem 重新分区/格式化
 (if "%BootType%"=="efi" (
     echo select disk %DiskIndex%
@@ -114,11 +122,13 @@ rem 重新分区/格式化
 
     echo create part efi size=%EFISize%
     echo format fs=fat32 quick
+    if "%UseDismInstall%"=="1" echo assign letter=S
 
     echo create part msr size=16
 
     echo create part primary
     echo format fs=ntfs quick
+    if "%UseDismInstall%"=="1" echo assign letter=C
     rem echo assign letter=Z
 ) else (
     echo select disk %DiskIndex%
@@ -128,6 +138,7 @@ rem 重新分区/格式化
     rem echo create part primary
     echo format fs=ntfs quick
     echo active
+    if "%UseDismInstall%"=="1" echo assign letter=C
     rem echo assign letter=Z
 )) > X:\diskpart.txt
 
@@ -169,6 +180,47 @@ move /y %tempFile% %file%
 rem https://github.com/pbatard/rufus/issues/1990
 for %%a in (RAM TPM SecureBoot CPU Storage) do (
     reg add HKLM\SYSTEM\Setup\LabConfig /t REG_DWORD /v Bypass%%aCheck /d 1 /f
+)
+
+if "%UseDismInstall%"=="1" (
+    echo Starting DISM installation...
+
+    rem Find install.wim/esd
+    set InstallWim=
+    if exist Y:\sources\install.wim set InstallWim=Y:\sources\install.wim
+    if exist Y:\sources\install.esd set InstallWim=Y:\sources\install.esd
+    if exist Y:\install.wim set InstallWim=Y:\install.wim
+    if exist Y:\install.esd set InstallWim=Y:\install.esd
+
+    if "%InstallWim%"=="" (
+        echo Error: install.wim not found!
+        exit /b 1
+    )
+
+    rem Apply Image
+    dism /Apply-Image /ImageFile:%InstallWim% /Index:1 /ApplyDir:C:\
+
+    rem Setup Bootloader
+    if "%BootType%"=="efi" (
+        bcdboot C:\Windows /s S: /f UEFI
+    ) else (
+        bcdboot C:\Windows /s C: /f BIOS
+    )
+
+    rem Copy Unattend
+    mkdir C:\Windows\Panther
+    copy /y X:\windows.xml C:\Windows\Panther\unattend.xml
+
+    rem Inject Registry Bypasses into Offline System to pass OOBE checks
+    reg load HKLM\OFFLINE C:\Windows\System32\config\SYSTEM
+    for %%a in (RAM TPM SecureBoot CPU Storage) do (
+        reg add HKLM\OFFLINE\Setup\LabConfig /t REG_DWORD /v Bypass%%aCheck /d 1 /f
+    )
+    reg unload HKLM\OFFLINE
+
+    echo DISM installation complete. Rebooting...
+    wpeutil reboot
+    exit /b
 )
 
 rem 设置
