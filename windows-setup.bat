@@ -176,6 +176,15 @@ set ForceOldSetup=0
 set EnableUnattended=1
 set EnableEMS=0
 
+rem 新版安装程序不会创建 BIOS MBR 引导
+rem 因此要回退到旧版，或者手动修复 MBR
+rem server 2025 + bios 也是
+rem 但是 server 2025 官网写支持 bios
+rem TODO: 使用 ms-sys 可以不修复？
+if %BuildNumber% GEQ 26040 (
+    set ForceOldSetup=1
+)
+
 rem 运行 ramdisk X:\setup.exe 的话
 rem vista 会找不到安装源
 rem server 23h2 会无法运行
@@ -191,15 +200,6 @@ if "%EnableUnattended%"=="1" (
 )
 
 rem 新版安装程序默认开了 Compact OS
-
-rem 新版安装程序不会创建 BIOS MBR 引导
-rem 因此要回退到旧版，或者手动修复 MBR
-rem server 2025 + bios 也是
-rem 但是 server 2025 官网写支持 bios
-rem TODO: 使用 ms-sys 可以不修复？
-if %BuildNumber% GEQ 26040 (
-    set ForceOldSetup=1
-)
 
 if %BuildNumber% GEQ 26040 if "%BootType%"=="bios" (
     bootrec /fixmbr
