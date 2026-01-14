@@ -1080,9 +1080,13 @@ get_windows_iso_link_inner() {
             if [ -n "$iso" ]; then
                 # 解析 buzzheavier
                 if [[ "$iso" == *"buzzheavier.com"* ]]; then
-                    redirect_url=$(curl -s -D - "$iso/download" -H "Referer: $iso" -o /dev/null | grep -i '^hx-redirect:' | cut -d: -f2- | tr -d '[:space:]')
+                    # Try to get redirect URL (HTMX or standard Location)
+                    redirect_url=$(curl -s -D - "$iso/download" -H "Referer: $iso" -o /dev/null | grep -iE '^(hx-redirect|location):' | head -1 | cut -d: -f2- | tr -d '[:space:]')
                     if [ -n "$redirect_url" ]; then
                         iso=$redirect_url
+                    elif [[ "$iso" != */download ]]; then
+                        # Fallback: append /download if no redirect found and not already appended
+                        iso="$iso/download"
                     fi
                 fi
                 return
