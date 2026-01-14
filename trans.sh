@@ -3047,6 +3047,20 @@ modify_windows() {
         fi
     fi
 
+    # 6. dd 模式修改密码
+    if [ "$image_state" = IMAGE_STATE_COMPLETE ]; then
+        if password_base64=$(get_password_windows_administrator_base64); then
+            apk add musl-utils
+            # utf-16le base64 -> utf-8
+            # iconv -f UTF-16LE -t UTF-8
+            # sed 's/AdministratorPassword$//'
+            password=$(echo "$password_base64" | base64 -d | iconv -f UTF-16LE -t UTF-8 | sed 's/AdministratorPassword$//')
+            echo "net user Administrator \"$password\"" >$os_dir/windows-set-password.bat
+            unix2dos $os_dir/windows-set-password.bat
+            bats="$bats windows-set-password.bat"
+        fi
+    fi
+
     if $use_gpo; then
         # 使用组策略
         scripts_ini=$(get_path_in_correct_case $os_dir/Windows/System32/GroupPolicy/Machine/Scripts/scripts.ini)
