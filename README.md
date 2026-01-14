@@ -1,8 +1,8 @@
-# Rebuild VPS without Panel Login
+# Install Ulang VPS Tanpa Login Panel
 
-This guide provides instructions for rebuilding a VPS with various Linux distributions without needing to log in to a control panel. You can download and run the provided script to start the process.
+Panduan ini memberikan instruksi untuk menginstal ulang VPS dengan berbagai distribusi Linux atau Windows tanpa perlu login ke control panel. Anda dapat mengunduh dan menjalankan skrip yang disediakan untuk memulai prosesnya.
 
-## Supported Distributions and Versions
+## Distribusi dan Versi yang Didukung
 
 #Rebuild:
 ```
@@ -13,14 +13,14 @@ almalinux   8|9
 windows     10|11|server
 ```
 
-## Steps
+## Langkah-langkah
 
-1. Download the `reinstall.sh` script.
+1. Unduh skrip `reinstall.sh`.
 
    ```bash
    curl -O https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh
    ```
-2. OR
+2. ATAU jalankan langsung.
    ```bash
    bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) debian 10
    ```
@@ -30,13 +30,49 @@ windows     10|11|server
    ```
    bash <(curl https://raw.githubusercontent.com/Nizwara/reinstall/main/reinstall.sh) ubuntu 20.04
    ```
-3. Run the script by selecting the desired operating system distribution and version.
+3. Jalankan skrip dengan memilih distribusi dan versi sistem operasi yang diinginkan.
 
-### Command Examples
+### Contoh Perintah
+
+#### Instalasi Windows (RDP / Gambar DD)
+
+Gunakan perintah ini untuk instalasi RDP (Kata sandi Administrator akan diatur oleh skrip sesuai dengan yang Anda masukkan saat menjalankan skrip, atau jika tidak diminta, cek dokumentasi gambar sumber).
+
+**Windows Server 2022:**
+```bash
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_win2022.xz"
+```
+
+**Windows Server Lainnya:**
+
+Server 2019:
+```bash
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_win2019.xz"
+```
+
+Server 2016:
+```bash
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_win2016.xz"
+```
+
+Server 2012 R2:
+```bash
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_win2012r2.xz"
+```
+
+**Windows 10:**
+```bash
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_windows_10_22h2.xz"
+```
+
+**Windows 11:**
+```bash
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_windows_11_23h2.xz"
+```
 
 #### Ubuntu
 
-Install Ubuntu version 24.10, 24.04, 22.04, 20.04, 18.04, or 16.04:
+Install Ubuntu versi 24.10, 24.04, 22.04, 20.04, 18.04, atau 16.04:
 
 ```bash
 bash reinstall.sh ubuntu 24.10
@@ -62,7 +98,7 @@ bash reinstall.sh ubuntu 18.04
 bash reinstall.sh ubuntu 16.04
 ```
 
-For Ubuntu minimal installation:
+Untuk instalasi Ubuntu minimal:
 
 ```bash
 bash reinstall.sh ubuntu 24.10 --minimal
@@ -70,7 +106,7 @@ bash reinstall.sh ubuntu 24.10 --minimal
 
 #### Debian
 
-Install Debian version 12 (Bookworm), 11 (Bullseye), 10 (Buster), or 9 (Stretch):
+Install Debian versi 12 (Bookworm), 11 (Bullseye), 10 (Buster), atau 9 (Stretch):
 
 ```bash
 bash reinstall.sh debian 12
@@ -90,7 +126,7 @@ bash reinstall.sh debian 9
 
 #### CentOS
 
-Install CentOS version 10 or 9:
+Install CentOS versi 10 atau 9:
 
 ```bash
 bash reinstall.sh centos 10
@@ -102,7 +138,7 @@ bash reinstall.sh centos 9
 
 #### AlmaLinux
 
-Install AlmaLinux version 9 or 8:
+Install AlmaLinux versi 9 atau 8:
 
 ```bash
 bash reinstall.sh almalinux 9
@@ -112,11 +148,11 @@ bash reinstall.sh almalinux 9
 bash reinstall.sh almalinux 8
 ```
 
-#### Windows
+#### Instalasi Windows (ISO Resmi)
 
-Install Windows (will automatically search for ISO from massgrave.dev):
+Install Windows (akan otomatis mencari ISO dari massgrave.dev):
 
-**Supported Versions:**
+**Versi yang Didukung:**
 - **Windows 10:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2015, 2016, 2019, 2021)
 - **Windows 11:** Consumer (Home/Pro/Edu), Business (Pro/Enterprise), LTSC (2024)
 - **Windows Server:**
@@ -129,10 +165,10 @@ Install Windows (will automatically search for ISO from massgrave.dev):
 
 **Format:**
 ```bash
-bash reinstall.sh windows --image-name="windows [version] [edition]" --lang=[language]
+bash reinstall.sh windows --image-name="windows [versi] [edisi]" --lang=[bahasa]
 ```
 
-**Examples:**
+**Contoh:**
 
 Windows 10 Pro:
 ```bash
@@ -159,7 +195,7 @@ Windows Server 2012 R2 Datacenter:
 bash reinstall.sh windows --image-name="windows server 2012 r2 datacenter" --lang=en-us
 ```
 
-If you are running from Windows, use `reinstall.bat` (Run as Administrator):
+Jika Anda menjalankan dari Windows, gunakan `reinstall.bat` (Jalankan sebagai Administrator):
 ```cmd
 reinstall.bat windows --image-name="windows 11 pro"
 ```
