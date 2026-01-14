@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Reinstall Logs</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        #log-container {
+            height: 100vh;
+            margin: 0;
+            padding: 8px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #scroll-to-bottom {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #007acc;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        #scroll-to-bottom:hover {
+            opacity: 1;
+        }
+
+        #scroll-to-bottom svg {
+            fill: #fff;
+            width: 24px;
+            height: 24px;
+            margin-top: 12px;
+        }
+
+        .done {
+            background-color: #1e3e1e;
+        }
+
+        .error {
+            background-color: #3e1e1e;
+        }
+    </style>
+</head>
+
+<body>
+    <pre id="log-container"></pre>
+    <button id="scroll-to-bottom" title="Scroll to Bottom">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+        </svg>
+    </button>
+
+    <script>
+        // Simple ReconnectingWebSocket implementation to avoid external dependency
+        class ReconnectingWebSocket {
+            constructor(url) {
+                this.url = url;
+                this.ws = null;
+                this.onopen = null;
+                this.onclose = null;
+                this.onmessage = null;
+                this.reconnectInterval = 1000;
+                this.connect();
+            }
+
+            connect() {
+                this.ws = new WebSocket(this.url);
+
+                this.ws.onopen = () => {
+                    if (this.onopen) this.onopen();
+                };
+
+                this.ws.onmessage = (event) => {
+                    if (this.onmessage) this.onmessage(event);
+                };
+
+                this.ws.onclose = () => {
+                    if (this.onclose) this.onclose();
+                    setTimeout(() => this.connect(), this.reconnectInterval);
+                };
+
+                this.ws.onerror = (err) => {
+                    console.error('WebSocket encountered error: ', err, 'Closing socket');
+                    this.ws.close();
+                };
+            }
+        }
+
+        const logContainer = document.getElementById('log-container');
+        const scrollToBottomButton = document.getElementById('scroll-to-bottom');
+        let shouldScrollToBottom = true;
+
+        function updateScrollButton() {
+            // Tolerance of 5px
+            const isAtBottom = logContainer.scrollHeight - logContainer.scrollTop - logContainer.clientHeight < 5;
+            shouldScrollToBottom = isAtBottom;
+            scrollToBottomButton.style.display = isAtBottom ? 'none' : 'block';
+        }
+
+        scrollToBottomButton.addEventListener('click', () => {
+            logContainer.scrollTop = logContainer.scrollHeight;
+            updateScrollButton();
+        });
+
+        logContainer.addEventListener('scroll', updateScrollButton);
+
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = protocol + '//' + location.host + '/';
+
+        var ws = new ReconnectingWebSocket(wsUrl);
+
+        ws.onopen = function () {
+            logContainer.textContent += '\n*** WebSocket Connected ***\n';
+            if (shouldScrollToBottom) logContainer.scrollTop = logContainer.scrollHeight;
+        };
+
+        ws.onclose = function () {
+            // Don't spam log with disconnects, the ReconnectingWebSocket will handle reconnect
+            // logContainer.textContent += '\n*** WebSocket Disconnected ***\n';
+        };
+
+        ws.onmessage = function (event) {
+            logContainer.textContent += event.data + '\n'; // Add newline as websocketd might send lines without it if using stdbuf
+
+            if (shouldScrollToBottom) {
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            // Check content for status updates
+            if (event.data.includes('***** START TRANS *****')) {
+                document.body.className = '';
+            }
+            else if (event.data.includes('***** ERROR *****')) {
+                document.body.className = 'error';
+            }
+            else if (event.data.includes('***** DONE *****')) {
+                document.body.className = 'done';
+            }
+        };
+    </script>
+</body>
+
+</html>
