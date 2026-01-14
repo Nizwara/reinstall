@@ -6761,11 +6761,13 @@ EOF
     # 修改应答文件
     download $confhome/windows.xml /tmp/autounattend.xml
     if [ -n "$lang" ]; then
-        locale=$lang
+        os_locale=$lang
     else
-        locale=$(get_selected_image_prop 'Default Language')
-        [ -z "$locale" ] && locale=en-US
+        os_locale=$(get_selected_image_prop 'Default Language')
+        [ -z "$os_locale" ] && os_locale=en-US
     fi
+
+    pe_locale=$os_locale
 
     # 检查 locale 是否与 boot.wim 兼容
     # 否则 setup.exe 会卡在语言选择界面
@@ -6778,14 +6780,15 @@ EOF
         # 简单检查 locale 是否存在于 boot.wim 信息中（Languages: ... locale ...）
         # 或者 locale 等于 Default Language
         # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
-        if ! echo "$boot_wim_info" | grep -iq "Languages:.*$locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$locale" | to_lower)" ]; then
-            warn "Locale '$locale' not supported by boot.wim (Default: $boot_default_lang)."
-            # warn "Fallback to $boot_default_lang to prevent setup freeze."
-            # locale=$boot_default_lang
+        if ! echo "$boot_wim_info" | grep -iq "Languages:.*$os_locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$os_locale" | to_lower)" ]; then
+            warn "Locale '$os_locale' not supported by boot.wim (Default: $boot_default_lang)."
+            warn "Fallback to $boot_default_lang for PE to prevent setup freeze."
+            pe_locale=$boot_default_lang
         fi
     fi
 
-    echo "Locale: $locale"
+    echo "PE Locale: $pe_locale"
+    echo "OS Locale: $os_locale"
     use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
     password_base64=$(get_password_windows_administrator_base64)
     # 7601.24214.180801-1700.win7sp1_ldr_escrow_CLIENT_ULTIMATE_x64FRE_en-us.iso Image Name 为空
@@ -6793,7 +6796,8 @@ EOF
     sed -i \
         -e "s|%arch%|$arch|" \
         -e "s|%image_name%|$image_name|" \
-        -e "s|%locale%|$locale|" \
+        -e "s|%pe_locale%|$pe_locale|" \
+        -e "s|%os_locale%|$os_locale|" \
         -e "s|%administrator_password%|$password_base64|" \
         -e "s|%use_default_rdp_port%|$use_default_rdp_port|" \
         /tmp/autounattend.xml
