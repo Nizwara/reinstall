@@ -1017,6 +1017,8 @@ get_windows_iso_link() {
         # 匹配 href="http..." 或 href=http...
         # 还要匹配文件名
         curl -L "$page_url" >$tmp/win.html
+        # Format html to newlines
+        sed -i 's/<a /\n<a /g' "$tmp/win.html"
 
         # 如果不是 ltsc ，应该先去除 ltsc 链接，否则最终链接有 ltsc 的
         # 例如查找 windows 10 iot enterprise，会得到
