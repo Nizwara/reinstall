@@ -1016,7 +1016,9 @@ get_windows_iso_link() {
     if [ -n "$label_msdl" ]; then
         iso=$(curl -L "$page_url" | grep -ioP 'https://.*?#[0-9]+' | head -1 | grep .)
     else
-        curl -L "$page_url" | grep -ioP 'https://.*?.(iso|img)' >$tmp/win.list
+        # curl -L "$page_url" | grep -ioP 'https://.*?.(iso|img)' >$tmp/win.list
+        # massgrave.dev 现在使用 buzzheavier.com 链接，文件名在链接文本中
+        curl -L "$page_url" | grep -iE 'href=.*.(iso|img)' >$tmp/win.list
 
         # 如果不是 ltsc ，应该先去除 ltsc 链接，否则最终链接有 ltsc 的
         # 例如查找 windows 10 iot enterprise，会得到
@@ -1069,8 +1071,13 @@ get_windows_iso_link_inner() {
         regex=${regex// /_}
 
         echo "looking for: $regex" >&2
-        if iso=$(grep -Ei "/$regex" "$tmp/win.list" | get_shortest_line | grep .); then
-            return
+        # if iso=$(grep -Ei "/$regex" "$tmp/win.list" | get_shortest_line | grep .); then
+        if line=$(grep -Ei "$regex" "$tmp/win.list" | get_shortest_line | grep .); then
+            # 提取 href 链接
+            iso=$(echo "$line" | sed -n 's/.*href=["'\''\t ]*\([^\t "'\''>]*\).*/\1/p')
+            if [ -n "$iso" ]; then
+                return
+            fi
         fi
     done
 
