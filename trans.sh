@@ -6780,8 +6780,8 @@ EOF
         # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
         if ! echo "$boot_wim_info" | grep -iq "Languages:.*$locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$locale" | to_lower)" ]; then
             warn "Locale '$locale' not supported by boot.wim (Default: $boot_default_lang)."
-            warn "Fallback to $boot_default_lang to prevent setup freeze."
-            locale=$boot_default_lang
+            # warn "Fallback to $boot_default_lang to prevent setup freeze."
+            # locale=$boot_default_lang
         fi
     fi
 
