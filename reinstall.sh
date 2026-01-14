@@ -1486,7 +1486,7 @@ Continue?
         else
             # 需要用户输入 massgrave.dev 直链
             if grep -Eiq '\.massgrave\.dev/.*\.(iso|img)$' <<<"$iso" ||
-                grep -Eiq '\.gravesoft\.dev/#[0-9]+$' <<<"$iso"; then
+                grep -Eiq '\.gravesoft\.dev/.*#[0-9]+$' <<<"$iso"; then
                 info "Set Direct link"
                 # MobaXterm 不支持
                 # printf '\e]8;;http://example.com\e\\This is a link\e]8;;\e\\\n'
@@ -3586,14 +3586,25 @@ mod_initrd() {
     zcat /reinstall-initrd | cpio -idm \
         $(is_in_windows && echo --nonmatching 'dev/console' --nonmatching 'dev/null')
 
-    curl -Lo $initrd_dir/trans.sh $confhome/trans.sh
+    # Use local trans.sh if available (dev mode), otherwise download
+    if [ -f "$(dirname "$THIS_SCRIPT")/trans.sh" ]; then
+        cp "$(dirname "$THIS_SCRIPT")/trans.sh" $initrd_dir/trans.sh
+    else
+        curl -Lo $initrd_dir/trans.sh $confhome/trans.sh
+    fi
+
     if ! grep -iq "$SCRIPT_VERSION" $initrd_dir/trans.sh; then
         error_and_exit "
 This script is outdated, please download reinstall.sh again.
 脚本有更新，请重新下载 reinstall.sh"
     fi
 
-    curl -Lo $initrd_dir/initrd-network.sh $confhome/initrd-network.sh
+    if [ -f "$(dirname "$THIS_SCRIPT")/initrd-network.sh" ]; then
+        cp "$(dirname "$THIS_SCRIPT")/initrd-network.sh" $initrd_dir/initrd-network.sh
+    else
+        curl -Lo $initrd_dir/initrd-network.sh $confhome/initrd-network.sh
+    fi
+
     chmod a+x $initrd_dir/trans.sh $initrd_dir/initrd-network.sh
 
     # 保存配置
