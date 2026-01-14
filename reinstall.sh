@@ -1463,6 +1463,10 @@ Continue?
     }
 
     setos_windows() {
+        if [ -z "$lang" ]; then
+            lang=en-us
+        fi
+
         if [ -z "$iso" ]; then
             # 查找时将 windows longhorn serverdatacenter 改成 windows server 2008 serverdatacenter
             image_name=${image_name/windows longhorn server/windows server 2008 server}
