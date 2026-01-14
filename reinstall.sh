@@ -1560,11 +1560,16 @@ The current machine uses EFI boot, but the DD image seems not an EFI image.
 Continue with DD?
 当前机器使用 EFI 引导，但 DD 镜像可能不是 EFI 镜像。
 继续 DD?'
-                read -r -p '[y/N]: '
-                if [[ "$REPLY" = [Yy] ]]; then
+                if [[ "$img" == *"dl.lamp.sh"* ]]; then
+                    echo "Auto-confirming for dl.lamp.sh image."
                     eval ${step}_confirmed_no_efi=1
                 else
-                    exit
+                    read -r -p '[y/N]: '
+                    if [[ "$REPLY" = [Yy] ]]; then
+                        eval ${step}_confirmed_no_efi=1
+                    else
+                        exit
+                    fi
                 fi
             fi
         fi
@@ -4026,10 +4031,10 @@ if ! is_netboot_xyz && [ -z "$ssh_keys" ] && [ -z "$password" ]; then
     if is_use_dd; then
         echo "
 This password is only used for SSH access to view logs during the installation.
-Password of the image will NOT modify.
+Password of the image will NOT modify (Except for Windows).
 
 密码仅用于安装过程中通过 SSH 查看日志。
-镜像的密码不会被修改。
+镜像的密码不会被修改 (Windows 除外)。
 "
     fi
     prompt_password
