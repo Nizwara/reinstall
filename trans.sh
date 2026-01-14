@@ -6766,6 +6766,25 @@ EOF
         locale=$(get_selected_image_prop 'Default Language')
         [ -z "$locale" ] && locale=en-US
     fi
+
+    # 检查 locale 是否与 boot.wim 兼容
+    # 否则 setup.exe 会卡在语言选择界面
+    # 注意 boot.wim 索引通常为 2，但 trans.sh 已计算 boot_index
+    # busybox grep 不支持 -P，因此用 -i 匹配
+    boot_wim_info=$(wiminfo "/iso/$sources_boot_wim" "$boot_index")
+    # 如果 boot.wim 没有 Default Language，则跳过检查
+    if boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Default Language:" | cut -d: -f2- | trim) && [ -n "$boot_default_lang" ]; then
+        echo "Boot WIM Default Language: $boot_default_lang"
+        # 简单检查 locale 是否存在于 boot.wim 信息中（Languages: ... locale ...）
+        # 或者 locale 等于 Default Language
+        # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
+        if ! echo "$boot_wim_info" | grep -iq "Languages:.*$locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$locale" | to_lower)" ]; then
+            warn "Locale '$locale' not supported by boot.wim (Default: $boot_default_lang)."
+            warn "Fallback to $boot_default_lang to prevent setup freeze."
+            locale=$boot_default_lang
+        fi
+    fi
+
     echo "Locale: $locale"
     use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
     password_base64=$(get_password_windows_administrator_base64)
