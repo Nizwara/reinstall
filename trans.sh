@@ -6759,7 +6759,11 @@ EOF
     }
 
     # 修改应答文件
-    download $confhome/windows.xml /tmp/autounattend.xml
+    if [ -f /configs/windows.xml ]; then
+        cp /configs/windows.xml /tmp/autounattend.xml
+    else
+        download $confhome/windows.xml /tmp/autounattend.xml
+    fi
     if [ -n "$lang" ]; then
         os_locale=$lang
     else

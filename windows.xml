@@ -41,6 +41,10 @@
             <UILanguage>%pe_locale%</UILanguage>
             <UserLocale>%pe_locale%</UserLocale>
             <UILanguageFallback>en-US</UILanguageFallback>
+            <SetupUILanguage>
+                <UILanguage>%pe_locale%</UILanguage>
+                <WillShowUI>OnError</WillShowUI>
+            </SetupUILanguage>
         </component>
     </settings>
 

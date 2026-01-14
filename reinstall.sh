@@ -3609,6 +3609,9 @@ This script is outdated, please download reinstall.sh again.
 
     # 保存配置
     mkdir -p $initrd_dir/configs
+    if [ -f "$(dirname "$THIS_SCRIPT")/windows.xml" ]; then
+        cp "$(dirname "$THIS_SCRIPT")/windows.xml" $initrd_dir/configs/windows.xml
+    fi
     if [ -n "$ssh_keys" ]; then
         cat <<<"$ssh_keys" >$initrd_dir/configs/ssh_keys
     else
