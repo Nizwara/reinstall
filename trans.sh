@@ -6812,17 +6812,25 @@ EOF
     # 注意 boot.wim 索引通常为 2，但 trans.sh 已计算 boot_index
     # busybox grep 不支持 -P，因此用 -i 匹配
     boot_wim_info=$(wiminfo "/iso/$sources_boot_wim" "$boot_index")
-    # 如果 boot.wim 没有 Default Language，则跳过检查
-    if boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Default Language:" | cut -d: -f2- | trim) && [ -n "$boot_default_lang" ]; then
-        echo "Boot WIM Default Language: $boot_default_lang"
-        # 简单检查 locale 是否存在于 boot.wim 信息中（Languages: ... locale ...）
-        # 或者 locale 等于 Default Language
-        # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
-        if ! echo "$boot_wim_info" | grep -iq "Languages:.*$os_locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$os_locale" | to_lower)" ]; then
-            warn "Locale '$os_locale' not supported by boot.wim (Default: $boot_default_lang)."
-            warn "Fallback to $boot_default_lang for PE to prevent setup freeze."
-            pe_locale=$boot_default_lang
-        fi
+    # 尝试获取 Default Language
+    boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Default Language:" | cut -d: -f2- | trim)
+    # 如果没获取到 Default Language，尝试获取 Languages 的第一个
+    if [ -z "$boot_default_lang" ]; then
+        boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Languages:" | head -1 | awk '{print $2}' | trim)
+    fi
+    # 如果还是没获取到，默认为 en-US
+    if [ -z "$boot_default_lang" ]; then
+        boot_default_lang="en-US"
+    fi
+    echo "Boot WIM Default Language: $boot_default_lang"
+
+    # 简单检查 locale 是否存在于 boot.wim 信息中（Languages: ... locale ...）
+    # 或者 locale 等于 Default Language
+    # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
+    if ! echo "$boot_wim_info" | grep -iq "Languages:.*$os_locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$os_locale" | to_lower)" ]; then
+        warn "Locale '$os_locale' not supported by boot.wim (Default: $boot_default_lang)."
+        warn "Fallback to $boot_default_lang for PE to prevent setup freeze."
+        pe_locale=$boot_default_lang
     fi
 
     echo "PE Locale: $pe_locale"
