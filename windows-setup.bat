@@ -167,21 +167,19 @@ if %BuildNumber% GEQ 26040 (
 )
 
 rem 设置应答文件的主硬盘 id
-set "file=X:\windows.xml"
-set "tempFile=X:\tmp.xml"
-
-set "search=%%disk_id%%"
-set "replace=%DiskIndex%"
-
-(for /f "delims=" %%i in (%file%) do (
-    set "line=%%i"
-
-    setlocal EnableDelayedExpansion
-    echo !line:%search%=%replace%!
-    endlocal
-
-)) > %tempFile%
-move /y %tempFile% %file%
+echo Dim fso, inputFile, outputFile, content > X:\replace.vbs
+echo Set fso = CreateObject("Scripting.FileSystemObject") >> X:\replace.vbs
+echo Set inputFile = fso.OpenTextFile("X:\windows.xml", 1) >> X:\replace.vbs
+echo content = inputFile.ReadAll >> X:\replace.vbs
+echo inputFile.Close >> X:\replace.vbs
+echo content = Replace(content, "%%disk_id%%", "%DiskIndex%") >> X:\replace.vbs
+echo Set outputFile = fso.CreateTextFile("X:\windows.xml", True) >> X:\replace.vbs
+echo outputFile.Write content >> X:\replace.vbs
+echo outputFile.Close >> X:\replace.vbs
+if exist %SystemRoot%\System32\cscript.exe (
+    cscript //nologo X:\replace.vbs
+)
+del X:\replace.vbs
 
 
 rem https://github.com/pbatard/rufus/issues/1990
@@ -286,6 +284,24 @@ rem 现在通过 trans.sh 准确检测系统是否有 SAC 组件，有则修改 
 if "%EnableEMS%"=="1" (
     rem set EMS=/EMSPort:UseBIOSSettings /EMSBaudRate:115200
     set EMS=/EMSPort:COM1 /EMSBaudRate:115200
+)
+
+rem Run automator in background
+echo Set WshShell = WScript.CreateObject("WScript.Shell") > X:\automator.vbs
+echo Do >> X:\automator.vbs
+echo     WScript.Sleep 2000 >> X:\automator.vbs
+echo     If WshShell.AppActivate("Windows Setup") Or WshShell.AppActivate("Microsoft Server Operating System Setup") Then >> X:\automator.vbs
+echo         WshShell.SendKeys "{ENTER}" >> X:\automator.vbs
+echo     End If >> X:\automator.vbs
+echo Loop >> X:\automator.vbs
+
+if exist %SystemRoot%\System32\wscript.exe (
+    start wscript //nologo X:\automator.vbs
+)
+
+rem PowerShell Fallback Automator
+if exist %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe (
+    start powershell -NoProfile -Command "while($true){Start-Sleep -s 2; $wshell=New-Object -ComObject WScript.Shell; if($wshell.AppActivate('Windows Setup') -or $wshell.AppActivate('Microsoft Server Operating System Setup')){$wshell.SendKeys('{ENTER}')}}"
 )
 
 echo on
