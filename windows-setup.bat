@@ -100,6 +100,12 @@ for /f "tokens=3" %%a in (X:\disk.txt) do (
 )
 del X:\disk.txt
 
+if "%DiskIndex%"=="" (
+    echo Error: Disk index not found!
+    echo list disk | diskpart
+    exit /b 1
+)
+
 rem 这个变量会被 trans.sh 修改
 set is4kn=0
 if "%is4kn%"=="1" (
@@ -167,22 +173,62 @@ if %BuildNumber% GEQ 26040 (
 )
 
 rem 设置应答文件的主硬盘 id
-rem 使用 VBScript 替换文本，避免 bat 破坏 xml 格式
-(
-echo Const ForReading = 1
-echo Const ForWriting = 2
-echo Set objFSO = CreateObject("Scripting.FileSystemObject"^)
-echo Set objFile = objFSO.OpenTextFile("X:\windows.xml", ForReading^)
-echo strText = objFile.ReadAll
-echo objFile.Close
-echo strText = Replace(strText, "%%disk_id%%", WScript.Arguments(0^)^)
-echo Set objFile = objFSO.OpenTextFile("X:\windows.xml", ForWriting^)
-echo objFile.Write strText
-echo objFile.Close
-) > X:\replace.vbs
+set "file=X:\windows.xml"
+set "tempFile=X:\tmp.xml"
+set "search=%%disk_id%%"
+set "replace=%DiskIndex%"
 
-cscript //nologo X:\replace.vbs %DiskIndex%
-del X:\replace.vbs
+rem 尝试使用 VBScript (最稳健)
+echo Checking for cscript...
+if exist %SystemRoot%\System32\cscript.exe (
+    echo Using VBScript for XML modification...
+    (
+    echo Const ForReading = 1
+    echo Const ForWriting = 2
+    echo Set objFSO = CreateObject("Scripting.FileSystemObject"^)
+    echo Set objFile = objFSO.OpenTextFile("%file%", ForReading^)
+    echo strText = objFile.ReadAll
+    echo objFile.Close
+    echo strText = Replace(strText, "%search%", WScript.Arguments(0^)^)
+    echo Set objFile = objFSO.OpenTextFile("%file%", ForWriting^)
+    echo objFile.Write strText
+    echo objFile.Close
+    ) > X:\replace.vbs
+
+    cscript //nologo X:\replace.vbs "%replace%"
+    del X:\replace.vbs
+    goto :VerifyXml
+)
+
+rem 尝试使用 PowerShell (Server 镜像通常包含)
+echo Checking for PowerShell...
+powershell -Command "Get-Command" >nul 2>nul
+if not errorlevel 1 (
+    echo Using PowerShell for XML modification...
+    powershell -Command "(Get-Content '%file%') -replace '%search%', '%replace%' | Set-Content '%file%'"
+    goto :VerifyXml
+)
+
+rem 降级到 Batch (可能破坏 XML 格式，作为最后手段)
+echo Warning: cscript and powershell not found. Falling back to Batch...
+(for /f "delims=" %%i in (%file%) do (
+    set "line=%%i"
+    setlocal EnableDelayedExpansion
+    echo !line:%search%=%replace%!
+    endlocal
+)) > %tempFile%
+move /y %tempFile% %file%
+
+:VerifyXml
+rem 验证是否替换成功
+find "%search%" %file% >nul
+if not errorlevel 1 (
+    echo Error: Failed to replace disk_id in windows.xml!
+    rem 如果替换失败，setup.exe 将会忽略该文件，导致无人值守失败
+    rem 尝试强制写入 (可能导致 XML 语法错误，但也比不做强)
+    rem 这里选择退出报错
+    exit /b 1
+)
 
 
 rem https://github.com/pbatard/rufus/issues/1990
