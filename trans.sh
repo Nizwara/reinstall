@@ -3000,6 +3000,43 @@ modify_windows() {
         use_gpo=false
     fi
 
+    # Inject unattend.xml for OOBE
+    if [ -f /configs/windows.xml ]; then
+        cp /configs/windows.xml /tmp/autounattend.xml
+    else
+        download $confhome/windows.xml /tmp/autounattend.xml
+    fi
+
+    if [ -n "$lang" ]; then
+        os_locale=$lang
+    else
+        os_locale=en-US
+    fi
+
+    if [ "$(echo "$os_locale" | to_lower)" = "en-us" ]; then
+        os_locale="en-US"
+    fi
+
+    password_base64=$(get_password_windows_administrator_base64)
+    use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
+    windows_arch=$(get_windows_arch_from_windows_drive "$os_dir" | to_lower)
+
+    apk add xmlstarlet
+    sed -i \
+        -e "s|%arch%|$windows_arch|" \
+        -e "s|%image_name%|DDImage|" \
+        -e "s|%pe_locale%|$os_locale|" \
+        -e "s|%os_locale%|$os_locale|" \
+        -e "s|%administrator_password%|$password_base64|" \
+        -e "s|%use_default_rdp_port%|$use_default_rdp_port|" \
+        -e "s|%key%||" \
+        -e "s|%installto_partitionid%|1|" \
+        /tmp/autounattend.xml
+
+    mkdir -p $os_dir/Windows/Panther
+    cp /tmp/autounattend.xml $os_dir/Windows/Panther/unattend.xml
+    apk del xmlstarlet
+
     # bat 列表
     bats=
 
@@ -6769,6 +6806,10 @@ EOF
     else
         os_locale=$(get_selected_image_prop 'Default Language')
         [ -z "$os_locale" ] && os_locale=en-US
+    fi
+
+    if [ "$(echo "$os_locale" | to_lower)" = "en-us" ]; then
+        os_locale="en-US"
     fi
 
     pe_locale=$os_locale
