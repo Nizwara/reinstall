@@ -3020,8 +3020,14 @@ modify_windows() {
     password_base64=$(get_password_windows_administrator_base64)
     use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
     windows_arch=$(get_windows_arch_from_windows_drive "$os_dir" | to_lower)
+    if [ -z "$windows_arch" ]; then
+        windows_arch=amd64
+    fi
 
     apk add xmlstarlet
+    # Remove ImageInstall as it requires %disk_id% which we don't have and don't need for DD
+    xmlstarlet ed -L -d "//_:ImageInstall" /tmp/autounattend.xml
+
     sed -i \
         -e "s|%arch%|$windows_arch|" \
         -e "s|%image_name%|DDImage|" \
@@ -3030,7 +3036,6 @@ modify_windows() {
         -e "s|%administrator_password%|$password_base64|" \
         -e "s|%use_default_rdp_port%|$use_default_rdp_port|" \
         -e "s|%key%||" \
-        -e "s|%installto_partitionid%|1|" \
         /tmp/autounattend.xml
 
     mkdir -p $os_dir/Windows/Panther
