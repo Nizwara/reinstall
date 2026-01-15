@@ -335,6 +335,21 @@ if "%EnableEMS%"=="1" (
     set EMS=/EMSPort:COM1 /EMSBaudRate:115200
 )
 
+rem Create Automator Script to click "Next" on language screen if it appears
+(
+echo Set WshShell = WScript.CreateObject("WScript.Shell"^)
+echo Do
+echo     WScript.Sleep 2000
+echo     If WshShell.AppActivate("Windows Setup"^) Or WshShell.AppActivate("Microsoft Server Operating System Setup"^) Then
+echo         WshShell.SendKeys "{ENTER}"
+echo         WScript.Sleep 1000
+echo     End If
+echo Loop
+) > X:\automator.vbs
+
+rem Run automator in background
+start wscript //nologo X:\automator.vbs
+
 echo on
 %setup% %ResizeRecoveryPartition% %EMS% %Unattended%
 exit /b

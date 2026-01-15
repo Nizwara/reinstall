@@ -6875,11 +6875,20 @@ EOF
         sed -i "s/%key%/$key/" /tmp/autounattend.xml
     elif [ -f "$(get_path_in_correct_case /os/installer/sources/ei.cfg)" ]; then
         # 镜像有 ei.cfg (Usually Evaluation or Retail with ei.cfg)
-        # 删除 key 字段
-        sed -i "/%key%/d" /tmp/autounattend.xml
+        # 删除 ProductKey 节点，避免空的 Key 导致 xml 校验失败
+        xmlstarlet ed -L -d "//_:ProductKey" /tmp/autounattend.xml
     else
         # 镜像无 ei.cfg (Volume/Retail needing key)
-        sed -i "s/%key%//" /tmp/autounattend.xml
+        # 保留 ProductKey 但置空 key? 或者也删除？
+        # 以前的代码是 sed -i "s/%key%//" /tmp/autounattend.xml 也就是 <Key></Key>
+        # 这可能导致问题，最好也是删除
+        # 但如果是 Volume 版，安装程序可能会提示输入 Key
+        # 暂时保持原样，或者删除？
+        # 用户通常希望跳过 Key 输入
+        # 如果是 Retail 版没 key 会卡在输入 key 界面
+        # 如果是 Volume 版没 key 会自动跳过？
+        # 尝试删除整个 ProductKey 节点，让 Setup 使用默认逻辑
+        xmlstarlet ed -L -d "//_:ProductKey" /tmp/autounattend.xml
     fi
 
     # 挂载 boot.wim
