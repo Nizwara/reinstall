@@ -167,21 +167,22 @@ if %BuildNumber% GEQ 26040 (
 )
 
 rem 设置应答文件的主硬盘 id
-set "file=X:\windows.xml"
-set "tempFile=X:\tmp.xml"
+rem 使用 VBScript 替换文本，避免 bat 破坏 xml 格式
+(
+echo Const ForReading = 1
+echo Const ForWriting = 2
+echo Set objFSO = CreateObject("Scripting.FileSystemObject"^)
+echo Set objFile = objFSO.OpenTextFile("X:\windows.xml", ForReading^)
+echo strText = objFile.ReadAll
+echo objFile.Close
+echo strText = Replace(strText, "%%disk_id%%", WScript.Arguments(0^)^)
+echo Set objFile = objFSO.OpenTextFile("X:\windows.xml", ForWriting^)
+echo objFile.Write strText
+echo objFile.Close
+) > X:\replace.vbs
 
-set "search=%%disk_id%%"
-set "replace=%DiskIndex%"
-
-(for /f "delims=" %%i in (%file%) do (
-    set "line=%%i"
-
-    setlocal EnableDelayedExpansion
-    echo !line:%search%=%replace%!
-    endlocal
-
-)) > %tempFile%
-move /y %tempFile% %file%
+cscript //nologo X:\replace.vbs %DiskIndex%
+del X:\replace.vbs
 
 
 rem https://github.com/pbatard/rufus/issues/1990
