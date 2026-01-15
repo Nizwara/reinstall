@@ -3042,7 +3042,7 @@ modify_windows() {
     cp /tmp/autounattend.xml $os_dir/Windows/Panther/unattend.xml
     # Put autounattend.xml in root as well, in case the image is a bootable installer
     cp /tmp/autounattend.xml $os_dir/autounattend.xml
-    apk del xmlstarlet
+    # apk del xmlstarlet
 
     # bat 列表
     bats=
@@ -6942,7 +6942,7 @@ EOF
     wim_windows_xml=$(get_path_in_correct_case /wim/windows.xml)
     wim_setup_exe=$(get_path_in_correct_case /wim/setup.exe)
 
-    apk add xmlstarlet
+    # apk add xmlstarlet
     xmlstarlet ed -d '//comment()' /tmp/autounattend.xml >$wim_autounattend_xml
     unix2dos $wim_autounattend_xml
     info "autounattend.xml"
