@@ -5713,7 +5713,7 @@ install_windows() {
     # shellcheck disable=SC1090
     . <(wget -O- $confhome/windows-driver-utils.sh)
 
-    apk add wimlib
+    apk add wimlib xmlstarlet
 
     download $iso /os/windows.iso
     mount -o ro /os/windows.iso /iso
@@ -6812,25 +6812,17 @@ EOF
     # 注意 boot.wim 索引通常为 2，但 trans.sh 已计算 boot_index
     # busybox grep 不支持 -P，因此用 -i 匹配
     boot_wim_info=$(wiminfo "/iso/$sources_boot_wim" "$boot_index")
-    # 尝试获取 Default Language
-    boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Default Language:" | cut -d: -f2- | trim)
-    # 如果没获取到 Default Language，尝试获取 Languages 的第一个
-    if [ -z "$boot_default_lang" ]; then
-        boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Languages:" | head -1 | awk '{print $2}' | trim)
-    fi
-    # 如果还是没获取到，默认为 en-US
-    if [ -z "$boot_default_lang" ]; then
-        boot_default_lang="en-US"
-    fi
-    echo "Boot WIM Default Language: $boot_default_lang"
-
-    # 简单检查 locale 是否存在于 boot.wim 信息中（Languages: ... locale ...）
-    # 或者 locale 等于 Default Language
-    # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
-    if ! echo "$boot_wim_info" | grep -iq "Languages:.*$os_locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$os_locale" | to_lower)" ]; then
-        warn "Locale '$os_locale' not supported by boot.wim (Default: $boot_default_lang)."
-        warn "Fallback to $boot_default_lang for PE to prevent setup freeze."
-        pe_locale=$boot_default_lang
+    # 如果 boot.wim 没有 Default Language，则跳过检查
+    if boot_default_lang=$(echo "$boot_wim_info" | grep -i "^Default Language:" | cut -d: -f2- | trim) && [ -n "$boot_default_lang" ]; then
+        echo "Boot WIM Default Language: $boot_default_lang"
+        # 简单检查 locale 是否存在于 boot.wim 信息中（Languages: ... locale ...）
+        # 或者 locale 等于 Default Language
+        # 如果 locale 不在 boot.wim 中，则回退到 boot.wim 的默认语言
+        if ! echo "$boot_wim_info" | grep -iq "Languages:.*$os_locale" && ! [ "$(echo "$boot_default_lang" | to_lower)" = "$(echo "$os_locale" | to_lower)" ]; then
+            warn "Locale '$os_locale' not supported by boot.wim (Default: $boot_default_lang)."
+            warn "Fallback to $boot_default_lang for PE to prevent setup freeze."
+            pe_locale=$boot_default_lang
+        fi
     fi
 
     echo "PE Locale: $pe_locale"
@@ -6875,20 +6867,11 @@ EOF
         sed -i "s/%key%/$key/" /tmp/autounattend.xml
     elif [ -f "$(get_path_in_correct_case /os/installer/sources/ei.cfg)" ]; then
         # 镜像有 ei.cfg (Usually Evaluation or Retail with ei.cfg)
-        # 删除 ProductKey 节点，避免空的 Key 导致 xml 校验失败
-        xmlstarlet ed -L -d "//_:ProductKey" /tmp/autounattend.xml
+        # 删除 key 字段
+        sed -i "/%key%/d" /tmp/autounattend.xml
     else
         # 镜像无 ei.cfg (Volume/Retail needing key)
-        # 保留 ProductKey 但置空 key? 或者也删除？
-        # 以前的代码是 sed -i "s/%key%//" /tmp/autounattend.xml 也就是 <Key></Key>
-        # 这可能导致问题，最好也是删除
-        # 但如果是 Volume 版，安装程序可能会提示输入 Key
-        # 暂时保持原样，或者删除？
-        # 用户通常希望跳过 Key 输入
-        # 如果是 Retail 版没 key 会卡在输入 key 界面
-        # 如果是 Volume 版没 key 会自动跳过？
-        # 尝试删除整个 ProductKey 节点，让 Setup 使用默认逻辑
-        xmlstarlet ed -L -d "//_:ProductKey" /tmp/autounattend.xml
+        sed -i "s/%key%//" /tmp/autounattend.xml
     fi
 
     # 挂载 boot.wim
