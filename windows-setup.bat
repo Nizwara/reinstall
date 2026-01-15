@@ -291,6 +291,7 @@ echo Set WshShell = WScript.CreateObject("WScript.Shell") > X:\automator.vbs
 echo Do >> X:\automator.vbs
 echo     WScript.Sleep 2000 >> X:\automator.vbs
 echo     If WshShell.AppActivate("Windows Setup") Or WshShell.AppActivate("Microsoft Server Operating System Setup") Then >> X:\automator.vbs
+echo         WshShell.SendKeys "%%n" >> X:\automator.vbs
 echo         WshShell.SendKeys "{ENTER}" >> X:\automator.vbs
 echo     End If >> X:\automator.vbs
 echo Loop >> X:\automator.vbs
@@ -301,7 +302,7 @@ if exist %SystemRoot%\System32\wscript.exe (
 
 rem PowerShell Fallback Automator
 if exist %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe (
-    start powershell -NoProfile -Command "while($true){Start-Sleep -s 2; $wshell=New-Object -ComObject WScript.Shell; if($wshell.AppActivate('Windows Setup') -or $wshell.AppActivate('Microsoft Server Operating System Setup')){$wshell.SendKeys('{ENTER}')}}"
+    start powershell -NoProfile -Command "while($true){Start-Sleep -s 2; $wshell=New-Object -ComObject WScript.Shell; if($wshell.AppActivate('Windows Setup') -or $wshell.AppActivate('Microsoft Server Operating System Setup')){$wshell.SendKeys('%%n'); $wshell.SendKeys('{ENTER}')}}"
 )
 
 echo on
