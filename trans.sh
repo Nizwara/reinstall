@@ -3035,6 +3035,8 @@ modify_windows() {
 
     mkdir -p $os_dir/Windows/Panther
     cp /tmp/autounattend.xml $os_dir/Windows/Panther/unattend.xml
+    # Put autounattend.xml in root as well, in case the image is a bootable installer
+    cp /tmp/autounattend.xml $os_dir/autounattend.xml
     apk del xmlstarlet
 
     # bat 列表
