@@ -3001,7 +3001,15 @@ modify_windows() {
     fi
 
     # Inject unattend.xml for OOBE
+    password_base64=$(get_password_windows_administrator_base64)
+    use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
+    windows_arch=$(get_windows_arch_from_windows_drive "$os_dir" | to_lower)
+    if [ -z "$windows_arch" ]; then
+        windows_arch=amd64
+    fi
+
     if [ -f /configs/windows.xml ]; then
+        echo "Using local windows.xml config"
         cp /configs/windows.xml /tmp/autounattend.xml
     else
         download $confhome/windows.xml /tmp/autounattend.xml
@@ -3015,13 +3023,6 @@ modify_windows() {
 
     if [ "$(echo "$os_locale" | to_lower)" = "en-us" ]; then
         os_locale="en-US"
-    fi
-
-    password_base64=$(get_password_windows_administrator_base64)
-    use_default_rdp_port=$(is_need_change_rdp_port && echo false || echo true)
-    windows_arch=$(get_windows_arch_from_windows_drive "$os_dir" | to_lower)
-    if [ -z "$windows_arch" ]; then
-        windows_arch=amd64
     fi
 
     apk add xmlstarlet
@@ -6790,10 +6791,12 @@ EOF
 
     # 修改应答文件
     if [ -f /configs/windows.xml ]; then
+        echo "Using local windows.xml config"
         cp /configs/windows.xml /tmp/autounattend.xml
     else
         download $confhome/windows.xml /tmp/autounattend.xml
     fi
+
     if [ -n "$lang" ]; then
         os_locale=$lang
     else

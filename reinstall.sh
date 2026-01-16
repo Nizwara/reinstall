@@ -3606,6 +3606,24 @@ This script is outdated, please download reinstall.sh again.
     mkdir -p $initrd_dir/configs
     if [ -f "$(dirname "$THIS_SCRIPT")/windows.xml" ]; then
         cp "$(dirname "$THIS_SCRIPT")/windows.xml" $initrd_dir/configs/windows.xml
+
+        # Pre-patch windows.xml to prevent Setup freeze due to empty variables
+        # %disk_id% must be preserved for setup.bat
+        win_arch=$basearch_alt
+        win_lang=${lang:-en-US}
+
+        # Normalize lang (e.g. en-us -> en-US) if needed, though windows.xml usually handles case insensitivity or normalized values
+        if [ "${win_lang,,}" = "en-us" ]; then win_lang="en-US"; fi
+
+        sed -i "s|%arch%|$win_arch|g" $initrd_dir/configs/windows.xml
+        sed -i "s|%locale%|$win_lang|g" $initrd_dir/configs/windows.xml
+        sed -i "s|%pe_locale%|$win_lang|g" $initrd_dir/configs/windows.xml
+        sed -i "s|%os_locale%|$win_lang|g" $initrd_dir/configs/windows.xml
+
+        # Force WillShowUI to Never
+        if grep -q "<WillShowUI>" $initrd_dir/configs/windows.xml; then
+            sed -i 's|<WillShowUI>.*</WillShowUI>|<WillShowUI>Never</WillShowUI>|g' $initrd_dir/configs/windows.xml
+        fi
     fi
     if [ -n "$ssh_keys" ]; then
         cat <<<"$ssh_keys" >$initrd_dir/configs/ssh_keys
