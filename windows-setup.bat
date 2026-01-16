@@ -292,17 +292,20 @@ echo Do >> X:\automator.vbs
 echo     WScript.Sleep 2000 >> X:\automator.vbs
 echo     If WshShell.AppActivate("Windows Setup") Or WshShell.AppActivate("Microsoft Server Operating System Setup") Then >> X:\automator.vbs
 echo         WshShell.SendKeys "%%n" >> X:\automator.vbs
+echo         WScript.Sleep 500 >> X:\automator.vbs
+echo         WshShell.SendKeys "%%n" >> X:\automator.vbs
+echo         WScript.Sleep 500 >> X:\automator.vbs
 echo         WshShell.SendKeys "{ENTER}" >> X:\automator.vbs
 echo     End If >> X:\automator.vbs
 echo Loop >> X:\automator.vbs
 
 if exist %SystemRoot%\System32\wscript.exe (
-    start wscript //nologo X:\automator.vbs
+    start "Automator" %SystemRoot%\System32\wscript.exe //nologo X:\automator.vbs
 )
 
 rem PowerShell Fallback Automator
 if exist %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe (
-    start powershell -NoProfile -Command "while($true){Start-Sleep -s 2; $wshell=New-Object -ComObject WScript.Shell; if($wshell.AppActivate('Windows Setup') -or $wshell.AppActivate('Microsoft Server Operating System Setup')){$wshell.SendKeys('%%n'); $wshell.SendKeys('{ENTER}')}}"
+    start "Automator" %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command "while($true){Start-Sleep -s 2; $wshell=New-Object -ComObject WScript.Shell; if($wshell.AppActivate('Windows Setup') -or $wshell.AppActivate('Microsoft Server Operating System Setup')){$wshell.SendKeys('%%n'); Start-Sleep -m 500; $wshell.SendKeys('%%n'); Start-Sleep -m 500; $wshell.SendKeys('{ENTER}')}}"
 )
 
 echo on
