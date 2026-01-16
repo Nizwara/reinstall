@@ -3179,7 +3179,7 @@ EOF
 
     # pata-modules      默认安装（改成可选），里面的驱动都是 pata_ 开头，但只有 pata_legacy.ko(+) 在云内核中
     # sata-modules      默认安装（改成可选），里面的驱动大部分是 sata_ 开头的，其他重要的还有 ahci.ko libahci.ko ata_piix.ko(+)
-    #                   云内核没有 sata 模块，也没有内嵌，有一个 CONFIG_SATA_HOST=y，libata-$(CONFIG_SATA_HOST)	+= libata-sata.o
+    #                   云内核没有 sata 模块，也没有内嵌，有一个 CONFIG_SATA_HOST=y，libata-$(CONFIG_SATA_HOST)   += libata-sata.o
     # scsi-modules      默认安装（改成可选），包含 nvme.ko(+) 和各种虚拟化驱动(+)
 
     download_and_extract_udeb() {
@@ -3309,9 +3309,9 @@ EOF
     fi
 
     # amd64)
-    # 	level1=737 # MT=754108, qemu: -m 780
-    # 	level2=424 # MT=433340, qemu: -m 460
-    # 	min=316    # MT=322748, qemu: -m 350
+    #   level1=737 # MT=754108, qemu: -m 780
+    #   level2=424 # MT=433340, qemu: -m 460
+    #   min=316    # MT=322748, qemu: -m 350
 
     # 将 use_level 2 9 修改为 use_level 1
     # x86 use_level 2 会出现 No root file system is defined.
@@ -3606,24 +3606,26 @@ This script is outdated, please download reinstall.sh again.
     mkdir -p $initrd_dir/configs
     if [ -f "$(dirname "$THIS_SCRIPT")/windows.xml" ]; then
         cp "$(dirname "$THIS_SCRIPT")/windows.xml" $initrd_dir/configs/windows.xml
+    else
+        curl -Lo $initrd_dir/configs/windows.xml $confhome/windows.xml
+    fi
 
-        # Pre-patch windows.xml to prevent Setup freeze due to empty variables
-        # %disk_id% must be preserved for setup.bat
-        win_arch=$basearch_alt
-        win_lang=${lang:-en-US}
+    # Pre-patch windows.xml to prevent Setup freeze due to empty variables
+    # %disk_id% must be preserved for setup.bat
+    win_arch=$basearch_alt
+    win_lang=${lang:-en-US}
 
-        # Normalize lang (e.g. en-us -> en-US) if needed, though windows.xml usually handles case insensitivity or normalized values
-        if [ "${win_lang,,}" = "en-us" ]; then win_lang="en-US"; fi
+    # Normalize lang (e.g. en-us -> en-US) if needed, though windows.xml usually handles case insensitivity or normalized values
+    if [ "${win_lang,,}" = "en-us" ]; then win_lang="en-US"; fi
 
-        sed -i "s|%arch%|$win_arch|g" $initrd_dir/configs/windows.xml
-        sed -i "s|%locale%|$win_lang|g" $initrd_dir/configs/windows.xml
-        sed -i "s|%pe_locale%|$win_lang|g" $initrd_dir/configs/windows.xml
-        sed -i "s|%os_locale%|$win_lang|g" $initrd_dir/configs/windows.xml
+    sed -i "s|%arch%|$win_arch|g" $initrd_dir/configs/windows.xml
+    sed -i "s|%locale%|$win_lang|g" $initrd_dir/configs/windows.xml
+    sed -i "s|%pe_locale%|$win_lang|g" $initrd_dir/configs/windows.xml
+    sed -i "s|%os_locale%|$win_lang|g" $initrd_dir/configs/windows.xml
 
-        # Force WillShowUI to Never
-        if grep -q "<WillShowUI>" $initrd_dir/configs/windows.xml; then
-            sed -i 's|<WillShowUI>.*</WillShowUI>|<WillShowUI>Never</WillShowUI>|g' $initrd_dir/configs/windows.xml
-        fi
+    # Force WillShowUI to Never
+    if grep -q "<WillShowUI>" $initrd_dir/configs/windows.xml; then
+        sed -i 's|<WillShowUI>.*</WillShowUI>|<WillShowUI>Never</WillShowUI>|g' $initrd_dir/configs/windows.xml
     fi
     if [ -n "$ssh_keys" ]; then
         cat <<<"$ssh_keys" >$initrd_dir/configs/ssh_keys
