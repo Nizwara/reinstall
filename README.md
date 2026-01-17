@@ -60,14 +60,14 @@ Server 2012 R2:
 bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_win2012r2.xz"
 ```
 
-**Windows 10:**
+**Windows 10 LTSC:**
 ```bash
-bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_windows_10_22h2.xz"
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_windows10_ltsc.xz"
 ```
 
 **Windows 11:**
 ```bash
-bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_windows_11_23h2.xz"
+bash reinstall.sh dd --img "https://dl.lamp.sh/vhd/en-us_windows11.xz"
 ```
 
 #### Ubuntu
